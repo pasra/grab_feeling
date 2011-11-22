@@ -37,10 +37,11 @@ module GrabFeeling
     end
 
     post "/event/:name" do
-      obj = JSON.parse(request.body)
+      obj = JSON.parse(request.body.read)
+      name = params[:name].to_sym
       EM.defer do
         @@logger.info("Event received: #{name}")
-        @@event_hooks[name].each{|x| x[obj] }
+        (@@event_hooks[name] ||= []).each{|x| x[obj] }
       end
     end
   end
