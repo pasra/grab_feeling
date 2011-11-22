@@ -9,7 +9,7 @@ module GrabFeeling
     class << self
       def notify(name, hash={})
         @@logger.info "Notifying #{name}..."
-        http = EM::HttpRequest.new(Config["url"]["websocket"]+"/#{name}") \
+        http = EM::HttpRequest.new(Config["url"]["websocket"]+"/event/#{name}") \
                               .post(body: hash.to_json)
         http.callback do
           if http.response_header.status == 200
@@ -19,6 +19,7 @@ module GrabFeeling
           end
         end
         http.errback { @@logger.error "Failed to notify (errback)" }
+        self
       end
     end
   end
