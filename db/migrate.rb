@@ -7,10 +7,13 @@ class TheMigration < ActiveRecord::Migration
       t.string :name
       t.boolean :listed
       t.boolean :watchable
+      t.boolean :ended, :default => false
       t.string :join_key
       t.string :watch_key
       t.string :drawer_id
-      t.datetime :started_at
+      t.string :unique_id
+      t.integer :round
+      t.integer :max_round
     end
 
     create_table :logs do |t|
@@ -22,7 +25,7 @@ class TheMigration < ActiveRecord::Migration
 
     create_table :players do |t|
       t.integer :room_id
-      t.string :token
+      t.boolean :admin
       t.string :name
       t.integer :point
     end
@@ -35,6 +38,11 @@ class TheMigration < ActiveRecord::Migration
     create_table :dictionaries do |t|
       t.string :name
     end
+
+    add_index :rooms, :unique_id
+    add_index :logs, :room_id
+    add_index :players, :room_id
+    add_index :themes, :dictionary_id
   end
 
   def self.down
