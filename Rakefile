@@ -1,3 +1,5 @@
+require_relative './lib/grab_feeling.rb'
+
 desc 'Migrate the database'
 task 'db:migrate' do
   require_relative './db/migrate'

@@ -1,8 +1,8 @@
 #-*- coding: utf-8 -*-
-require_relative '../init'
-require_relative '../lib/grab_feeling/config'
 require 'active_record'
 require 'logger'
+
+require 'grab_feeling/config'
 
 ActiveRecord::Base.logger = Logger.new(STDOUT)
 ActiveRecord::Base.logger.formatter = proc{|s,d,p,m| " #{m}\n" }

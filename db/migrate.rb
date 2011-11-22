@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-require_relative './db'
+require 'grab_feeling/db'
 
 class TheMigration < ActiveRecord::Migration
   def self.up

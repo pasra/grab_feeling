@@ -1,8 +1,7 @@
 #-*- coding: utf-8 -*-
+$:.unshift File.dirname(__FILE__)
 
 ENV["RACK_ENV"] ||= "development"
-
-$:.unshift File.join(File.dirname(__FILE__), 'lib')
 
 require 'rubygems'
 require 'bundler'
