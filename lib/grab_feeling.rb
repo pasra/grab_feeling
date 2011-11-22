@@ -16,4 +16,5 @@ require 'grab_feeling/model/status'
 require 'grab_feeling/model/theme'
 
 require 'grab_feeling/app'
+require 'grab_feeling/app_ws'
 require 'grab_feeling/communicator'
