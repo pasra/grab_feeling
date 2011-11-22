@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
-require 'sinatra'
+require 'sinatra/base'
+require 'sinatra/reloader'
 require 'digest/sha1'
 
 module GrabFeeling
