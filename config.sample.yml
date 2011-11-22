@@ -5,3 +5,8 @@ database:
   production:
     adapter: sqlite3
     database: db/production.sqlite
+
+key_salt: insertsalthere
+
+url:
+  websocket: http://localhost:4567/
