@@ -1,4 +1,4 @@
 #-*- coding: utf-8 -*-
-require 'sinatra'
-require 'eventmachine'
+require_relative './lib/grab_feeling'
 
+run GrabFeeling::App

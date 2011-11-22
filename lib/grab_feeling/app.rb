@@ -1,0 +1,109 @@
+#-*- coding: utf-8 -*-
+require 'sinatra'
+require 'digest/sha1'
+
+module GrabFeeling
+  class App < Sinatra::Base
+    configure :development do
+      register Sinatra::Reloader
+    end
+
+    configure do
+      set :root, File.expand_path("#{File.dirname(__FILE__)}/../..")
+      set :public_folder => Proc.new { File.join(root, 'public') }
+      set :views => Proc.new { File.join(root, 'views') }
+      set :default_locale, 'ja'
+      ::I18n.load_path += Dir["#{root}/i18n/*.yml"]
+      use Rack::Session::Cookie,
+        :expire_after => 60 * 60 * 24 * 12
+    end
+
+    get '/' do
+      @rooms = Room.all
+      haml :index
+    end
+
+    get '/create' do
+      haml :create
+    end
+
+    post '/create' do
+      room = params[:room].dup
+      room[:watchable] = (room[:watchable] == '1')
+      room[:listed] = (room[:listed] == '1')
+      room[:join_key] &&
+        room[:join_key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[:join_key])
+      room[:watch_key] &&
+        room[:watch_key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[:watch_key])
+
+      room.delete(:drawer_id)
+      room.delete(:unique_id)
+
+      @room = Room.new(room)
+
+      if @room.save
+        uid_a = Digest::SHA1.hexdigest("#{@room.id}#{Time.now.to_f}#{rand}").chars.to_a
+        uid = [6.times.map{ uid.shift }.join]+uid
+        @room.unique_id = uid.inject do |r,i|
+          if @room.first(:conditions => ["unique_id = ?", r = r+i])
+            r
+          else; break r
+          end
+        end
+        @room.save!
+        redirect "/g/#{@room.unique_id}"
+      else
+        haml :create
+      end
+    end
+
+    get '/g/:id' do
+      @room = Room.find_by_unique_id(params[:id])
+
+      if session[@room.session_key]
+        @player = Player.find_by_id(session[@room.session_key])
+        haml :room
+      else
+        haml :room_entrance
+      end
+    end
+
+    post '/g/:id/join' do
+      @room = Room.find_by_unique_id(params[:id])
+      player = params[:player].dup
+      @player = @room.players.build(player)
+
+      if @player.save
+        if @room.players[0].id == @player.id
+          @player.admin = true
+          @player.save!
+        end
+        session[@room.session_key] = @player.id
+        Communicator.notify :join, room_id: @room.id, player_id: @player.id,
+                                   player_name: @player.name
+        redirect "/g/#{@room.unique_id}"
+      else
+        haml :room_entrance
+      end
+    end
+
+    post '/g/:id/leave' do
+      @room = Room.find_by_unique_id(params[:id])
+      @player = Player.find_by_id(session[@room.session_key])
+      @room.players.delete(:dependent => :destroy)
+      session[@room.session_key] = nil
+      Communicator.notify :leave, room_id: @room.id, player_id: @player.id,
+                                 player_name: @player.name
+      if @room.players.empty?
+        @room.ended = true
+        @room.save!
+
+        Communicator.notify :room_end, room_id: @room.id
+
+        redirect "/"
+      else
+        redirect "/g/#{@room.id}"
+      end
+    end
+  end
+end
