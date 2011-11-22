@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
 require_relative './lib/grab_feeling'
+require 'rack'
 
-GrabFeeling::App.run!
+GrabFeeling::SocketApp.run!
