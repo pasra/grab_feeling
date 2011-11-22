@@ -1,2 +1,4 @@
 *.sqlite
 config.yml
+vendor/
+.bundle/
