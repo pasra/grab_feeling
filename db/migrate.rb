@@ -5,27 +5,29 @@ class TheMigration < ActiveRecord::Migration
   def self.up
     create_table :rooms do |t|
       t.string :name
-      t.boolean :listed
-      t.boolean :watchable
+      t.boolean :listed, :default => true
+      t.boolean :watchable, :default => true
       t.boolean :ended, :default => false
       t.string :join_key
       t.string :watch_key
       t.string :drawer_id
       t.string :unique_id
+      t.string :ws_server # for future use...
       t.integer :round
       t.integer :max_round
     end
 
     create_table :logs do |t|
       t.string :text
-      t.boolean :system
+      t.boolean :system, :default => false
       t.integer :player_id
       t.integer :room_id
     end
 
     create_table :players do |t|
       t.integer :room_id
-      t.boolean :admin
+      t.boolean :admin, :default => false
+      t.boolean :viewer, :default => false
       t.string :name
       t.string :token
       t.integer :point, :default => 0
