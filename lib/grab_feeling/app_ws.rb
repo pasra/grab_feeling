@@ -22,7 +22,7 @@ module GrabFeeling
 
     def ws_broadcast(room_id, msg={})
       message = msg.to_json
-      @@pool.find_by_room_id(room_id).each do |player|
+      @@pool.find_by_room_id(room_id).each do |pid,player|
         player[:socket].send message
       end
     end
