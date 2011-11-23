@@ -27,7 +27,8 @@ class TheMigration < ActiveRecord::Migration
       t.integer :room_id
       t.boolean :admin
       t.string :name
-      t.integer :point
+      t.string :token
+      t.integer :point, :default => 0
     end
 
     create_table :themes do |t|
