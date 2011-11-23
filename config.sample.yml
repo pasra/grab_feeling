@@ -10,3 +10,8 @@ key_salt: insertsalthere
 
 url:
   websocket: http://localhost:4567/
+
+websocket:
+  socket: /tmp/the.sock
+  port: 4566
+  bind: 127.0.0.1

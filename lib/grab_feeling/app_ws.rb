@@ -9,9 +9,14 @@ module GrabFeeling
     @@sockets = {}
     @@event_hooks = {}
     @@logger = Logger.new(STDOUT)
+    @@websocket = ->{}
 
     def self.hook_event(name,&block)
       (@@event_hooks[name] ||= []) << block
+    end
+
+    def self.websocket(&block)
+      @@websocket = block
     end
 
     hook_event :hi do
@@ -20,6 +25,9 @@ module GrabFeeling
 
     hook_event :hi do
       @@logger.info("Hello!")
+    end
+
+    websocket do |s|
     end
 
     configure :development do
@@ -34,6 +42,15 @@ module GrabFeeling
       ::I18n.load_path += Dir["#{root}/i18n/*.yml"]
       use Rack::Session::Cookie,
         :expire_after => 60 * 60 * 24 * 12
+
+      ws_opt = if Config["websocket"] && Config["websocket"]["socket"]
+                 {host: Config["websocket"]["socket"], port: nil}
+               else
+                 Config["websocket"] ||= {}
+                 {host: Config["websocket"]["host"] || "0.0.0.0",
+                  port: Config["websocket"]["port"] || 4566}
+               end
+      EM::WebSocket.start(ws_opt, &@@websocket)
     end
 
     post "/event/:name" do
