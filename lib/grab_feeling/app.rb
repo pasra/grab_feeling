@@ -60,6 +60,7 @@ module GrabFeeling
 
     get '/g/:id' do
       @room = Room.find_by_unique_id(params[:id])
+      return halt(404) unless @room
 
       if session[@room.session_key]
         @player = Player.find_by_id(session[@room.session_key])
@@ -71,7 +72,11 @@ module GrabFeeling
 
     post '/g/:id/join' do
       @room = Room.find_by_unique_id(params[:id])
+      return halt(404) unless @room
+      return redirect("/g/#{@room.unique_id}") if session[@room.session_key]
+
       player = params[:player].dup
+      player[:token] = Digest::SHA1.hexdigest(3.times.map{rand(100000000000)}.join)
       @player = @room.players.build(player)
 
       if @player.save
@@ -90,8 +95,11 @@ module GrabFeeling
 
     post '/g/:id/leave' do
       @room = Room.find_by_unique_id(params[:id])
+      return halt(404) unless @room
+      return redirect("/g/#{@room.unique_id}") unless session[@room.session_key]
+
       @player = Player.find_by_id(session[@room.session_key])
-      @room.players.delete(:dependent => :destroy)
+      @room.players.delete(@player, :dependent => :destroy)
       session[@room.session_key] = nil
       Communicator.notify :leave, room_id: @room.id, player_id: @player.id,
                                  player_name: @player.name
