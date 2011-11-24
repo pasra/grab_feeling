@@ -1,6 +1,8 @@
 #-*- coding: utf-8 -*-
 require 'sinatra/base'
 require 'sinatra/reloader'
+require 'eventmachine'
+require 'em-websocket'
 require 'digest/sha1'
 require 'json'
 require_relative './socket_pool.rb'
@@ -125,7 +127,9 @@ module GrabFeeling
       set :default_locale, 'ja'
       ::I18n.load_path += Dir["#{root}/i18n/*.yml"]
       use Rack::Session::Cookie, :expire_after => 60*60*24*12
+    end
 
+    EM.next_tick do
       ws_opt = if Config["websocket"] && Config["websocket"]["socket"]
                  {host: Config["websocket"]["socket"], port: nil}
                else
@@ -133,7 +137,7 @@ module GrabFeeling
                  {host: Config["websocket"]["host"] || "0.0.0.0",
                   port: Config["websocket"]["port"] || 4566}
                end
-      EM::WebSocket.start(ws_opt, &@@websocket)
+      EM.defer { EM::WebSocket.start(ws_opt, &@@websocket) }
     end
 
     post "/event/:name" do
