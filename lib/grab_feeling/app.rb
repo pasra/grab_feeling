@@ -117,5 +117,18 @@ module GrabFeeling
         redirect "/g/#{@room.id}"
       end
     end
+
+    get '/g/:id.json' do
+      @room = Room.find_by_unique_id(params[:id])
+      return halt(404) unless @room
+      return redirect("/g/#{@room.unique_id}") unless session[@room.session_key]
+
+      content_type :json
+      json = {locale: I18n.locale, system_logs: @room.statuses(true).map{|l| {en: l.en, ja: l.ja } },
+              logs: @room.logs(true).map{|l| {text: l.text, name: l.player.name, player_id: l.player.id} },
+              players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point} }}
+
+      json.to_json
+    end
   end
 end
