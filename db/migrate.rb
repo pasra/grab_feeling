@@ -5,22 +5,34 @@ class TheMigration < ActiveRecord::Migration
   def self.up
     create_table :rooms do |t|
       t.string :name
+      t.string :unique_id
+
       t.boolean :listed, :default => true
       t.boolean :watchable, :default => true
+
       t.boolean :ended, :default => false
+      t.boolean :started, :default => false
+
       t.string :join_key
       t.string :watch_key
-      t.string :drawer_id
-      t.string :unique_id
+
       t.string :ws_server # for future use...
+
       t.integer :round
       t.integer :max_round
+
+      t.integer :drawer_id
     end
 
     create_table :logs do |t|
       t.string :text
-      t.boolean :system, :default => false
       t.integer :player_id
+      t.integer :room_id
+    end
+
+    create_table :statuses do |t|
+      t.string :en
+      t.string :ja
       t.integer :room_id
     end
 
@@ -53,5 +65,7 @@ class TheMigration < ActiveRecord::Migration
     drop_table :logs
     drop_table :statuses
     drop_table :players
+    drop_table :themes
+    drop_table :dictionaries
   end
 end
