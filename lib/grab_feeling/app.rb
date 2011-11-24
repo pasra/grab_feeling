@@ -10,6 +10,7 @@ module GrabFeeling
     end
 
     configure do
+      helpers GrabFeeling::Helper
       set :root, File.expand_path("#{File.dirname(__FILE__)}/../..")
       set :public_folder => Proc.new { File.join(root, 'public') }
       set :views => Proc.new { File.join(root, 'views') }
@@ -87,6 +88,7 @@ module GrabFeeling
         session[@room.session_key] = @player.id
         Communicator.notify :join, room_id: @room.id, player_id: @player.id,
                                    player_name: @player.name
+        room.add_system_log :player_joined, name: @player.name
         redirect "/g/#{@room.unique_id}"
       else
         haml :room_entrance
@@ -103,7 +105,8 @@ module GrabFeeling
       session[@room.session_key] = nil
       Communicator.notify :leave, room_id: @room.id, player_id: @player.id,
                                  player_name: @player.name
-      if @room.players.empty?
+      room.add_system_log :player_left, name: @player.name
+      if @room.players.find(:all, :conditions => ['admin = true']).empty?
         @room.ended = true
         @room.save!
 
