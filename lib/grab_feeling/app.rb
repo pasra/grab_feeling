@@ -2,6 +2,7 @@
 require 'sinatra/base'
 require 'sinatra/reloader'
 require 'digest/sha1'
+require_relative './helper.rb'
 
 module GrabFeeling
   class App < Sinatra::Base
