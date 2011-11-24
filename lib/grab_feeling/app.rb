@@ -2,16 +2,23 @@
 require 'sinatra/base'
 require 'sinatra/reloader'
 require 'digest/sha1'
-require_relative './helper.rb'
+require 'i18n'
+require_relative './helper'
 
 module GrabFeeling
   class App < Sinatra::Base
+    def call(env)
+      ActiveRecord::Base.connection_pool.with_connection { dup.call!(env) }
+    end
+
     configure :development do
       register Sinatra::Reloader
     end
 
     configure do
       helpers GrabFeeling::Helper
+      set :lock, true
+      set :server => :thin
       set :root, File.expand_path("#{File.dirname(__FILE__)}/../..")
       set :public_folder => Proc.new { File.join(root, 'public') }
       set :views => Proc.new { File.join(root, 'views') }
@@ -34,21 +41,27 @@ module GrabFeeling
       room = params[:room].dup
       room[:watchable] = (room[:watchable] == '1')
       room[:listed] = (room[:listed] == '1')
-      room[:join_key] &&
+      room[:join_key].empty? ? room.delete(:join_key) :
         room[:join_key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[:join_key])
-      room[:watch_key] &&
+      room[:watch_key].empty? ? room.delete(:watch_key) :
         room[:watch_key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[:watch_key])
 
       room.delete(:drawer_id)
       room.delete(:unique_id)
+      room.delete(:ended)
+      room.delete(:started)
+      room.delete(:ws_server)
+      room.delete(:round)
+      room.delete(:max_loop)
+      room.delete(:loop)
 
       @room = Room.new(room)
 
       if @room.save
         uid_a = Digest::SHA1.hexdigest("#{@room.id}#{Time.now.to_f}#{rand}").chars.to_a
-        uid = [6.times.map{ uid.shift }.join]+uid
+        uid = [6.times.map{ uid_a.shift }.join]+uid_a
         @room.unique_id = uid.inject do |r,i|
-          if @room.first(:conditions => ["unique_id = ?", r = r+i])
+          if Room.first(:conditions => ["unique_id = ?", r = r+i])
             r
           else; break r
           end

@@ -10,6 +10,6 @@ class Room < ActiveRecord::Base
   validates_uniqueness_of :unique_id
 
   def session_key
-    :"player_#{@room.id}"
+    :"player_#{self.id}"
   end
 end

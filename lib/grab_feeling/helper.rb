@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-require 'digest/sha1'
+require 'i18n'
 
 module GrabFeeling
   module Helper
