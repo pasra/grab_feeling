@@ -60,7 +60,7 @@ module GrabFeeling
         json = JSON.parse(msg)
         @@logger.debug("#{ws.__id__}: json -> #{json}")
 
-        EM.defer do
+        ActiveRecord::Base.connection_pool.with_connection do
           i =  @@pool.find_by_socket(ws)
           case json["type"]
           when "image_request"
@@ -121,23 +121,13 @@ module GrabFeeling
     end
 
     configure do
+      set :server => :thin
       set :root, File.expand_path("#{File.dirname(__FILE__)}/../..")
       set :public_folder => Proc.new { File.join(root, 'public') }
       set :views => Proc.new { File.join(root, 'views') }
       set :default_locale, 'ja'
       ::I18n.load_path += Dir["#{root}/i18n/*.yml"]
       use Rack::Session::Cookie, :expire_after => 60*60*24*12
-    end
-
-    EM.next_tick do
-      ws_opt = if Config["websocket"] && Config["websocket"]["socket"]
-                 {host: Config["websocket"]["socket"], port: nil}
-               else
-                 Config["websocket"] ||= {}
-                 {host: Config["websocket"]["host"] || "0.0.0.0",
-                  port: Config["websocket"]["port"] || 4566}
-               end
-      EM.defer { EM::WebSocket.start(ws_opt, &@@websocket) }
     end
 
     post "/event/:name" do
