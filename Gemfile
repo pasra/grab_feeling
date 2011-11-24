@@ -1,11 +1,12 @@
 # A sample Gemfile
 source "http://rubygems.org"
 
-gem "i18n"
+gem "i18n"#, "~> 0.5.0"
 gem "execjs"
 gem "haml"
-gem "activerecord"
+gem "activerecord"#, "3.0.11"
 gem "sqlite3"
+gem "mysql2"
 gem "eventmachine"
 gem "em-http-request"
 gem "em-websocket"
