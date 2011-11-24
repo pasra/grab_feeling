@@ -18,8 +18,9 @@ class TheMigration < ActiveRecord::Migration
 
       t.string :ws_server # for future use...
 
-      t.integer :round
-      t.integer :max_round
+      t.integer :round, :default => 0
+      t.integer :loop, :default => 1
+      t.integer :max_loop, :default => 3
 
       t.integer :drawer_id
     end
