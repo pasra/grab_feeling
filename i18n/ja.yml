@@ -2,3 +2,13 @@ ja:
   title: Grab Feeling
   create_room: ルームを作成
   room_list: ルームリスト
+  room:
+    name: ルーム名
+    players: プレイヤー
+    viewers: 感染者
+    listed: ルームリストに表示
+    watchable: 観戦を許可
+    join_key: 参加パスワード
+    watch_key: 観戦パスワード
+    submit: ルームを作成
+    join_view: 参加/観戦

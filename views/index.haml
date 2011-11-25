@@ -9,11 +9,10 @@
     %h2= t(:room_list)
     %table
       %thead
-        %th
+        %tr
           %td= t(:'room.name')
           %td= t(:'room.players')
           %td= t(:'room.viewers')
-          %td
       %tbody
         - @rooms.each do |room|
           %tr
