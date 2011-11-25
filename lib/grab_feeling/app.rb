@@ -28,6 +28,28 @@ module GrabFeeling
         :expire_after => 60 * 60 * 24 * 12
     end
 
+    before do
+      if params[:locale]
+        locale = params[:locale].to_sym
+
+        if I18n.available_locales.include?(locale)
+          I18n.locale = session[:locale] = locale
+        end
+      elsif session[:locale]
+        I18n.locale = session[:locale].to_sym
+      elsif request.env['HTTP_ACCEPT_LANGUAGE']
+        locales = request.env['HTTP_ACCEPT_LANGUAGE'].split(/, ?/)
+        locales.map! {|l| (_ = l.split(/;q=/)).size == 1 ? \
+                          [_[0].to_sym,1.0] : [_[0].to_sym,_[1].to_f] }
+        locales.select! {|l| I18n.available_locales.include? l[0] }
+        locales.sort_by! {|l| l[1] }.reverse!
+
+        I18n.locale = locales.first[0]
+      else
+        I18n.locale = Config["default_language"].to_sym || :ja
+      end
+    end
+
     get '/' do
       @rooms = Room.all
       haml :index

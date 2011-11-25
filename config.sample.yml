@@ -20,3 +20,5 @@ operation:
   max_players: 10
   max_viewers: 20
   turn: 180 #sec
+
+default_language: ja
