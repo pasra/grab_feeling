@@ -11,6 +11,12 @@ module GrabFeeling
       ActiveRecord::Base.connection_pool.with_connection { dup.call!(env) }
     end
 
+    helpers do
+      def development?
+        App.development?
+      end
+    end
+
     configure :development do
       register Sinatra::Reloader
     end
@@ -29,6 +35,8 @@ module GrabFeeling
     end
 
     before do
+      I18n.reload! if development?
+
       if params[:locale]
         locale = params[:locale].to_sym
 
