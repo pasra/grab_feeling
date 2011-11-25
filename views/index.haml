@@ -10,9 +10,9 @@
     %table
       %thead
         %th
-          %td= t(:'room/name')
-          %td= t(:'room/players')
-          %td= t(:'room/viewers')
+          %td= t(:'room.name')
+          %td= t(:'room.players')
+          %td= t(:'room.viewers')
           %td
       %tbody
         - @rooms.each do |room|
@@ -24,4 +24,4 @@
               %span= GrabFeeling::Config["operation"]["max_players"]
             %td 0/0
             %td
-              %a{href: "/g/#{room.unique_id}"}= t(:'room/join_view')
+              %a{href: "/g/#{room.unique_id}"}= t(:'room.join_view')

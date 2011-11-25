@@ -6,20 +6,20 @@
   %body
     %form{action: "/create", method: "POST"}
       %p
-        %b= t(:'room/name')
+        %b= t(:'room.name')
         %input{type: "text", size: "40", name: "room[name]"}
       %p
-        %b= t(:'room/listed')
+        %b= t(:'room.listed')
         %input{type: "checkbox", name: "room[listed]", checked: "1", value: "1"}
       %p
-        %b= t(:'room/join_key')
+        %b= t(:'room.join_key')
         %input{type: "password", size: "40", name: "room[join_key]"}
       %p
-        %b= t(:'room/watchable')
+        %b= t(:'room.watchable')
         %input{type: "checkbox", name: "room[watchable]", checked: "1", value: "1"}
       %p
-        %b= t(:'room/watch_key')
+        %b= t(:'room.watch_key')
         %input{type: "password", size: "40", name: "room[watch_key]"}
       %p
-        %input{type: "submit", value: t(:'room/submit')}
+        %input{type: "submit", value: t(:'room.submit')}
 
