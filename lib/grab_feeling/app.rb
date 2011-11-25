@@ -42,9 +42,13 @@ module GrabFeeling
         locales.map! {|l| (_ = l.split(/;q=/)).size == 1 ? \
                           [_[0].to_sym,1.0] : [_[0].to_sym,_[1].to_f] }
         locales.select! {|l| I18n.available_locales.include? l[0] }
-        locales.sort_by! {|l| l[1] }.reverse!
+        if locales.empty?
+          I18n.locale = Config["default_language"].to_sym || :ja
+        else
+          locales.sort_by! {|l| l[1] }.reverse!
 
-        I18n.locale = locales.first[0]
+          I18n.locale = locales.first[0]
+        end
       else
         I18n.locale = Config["default_language"].to_sym || :ja
       end
