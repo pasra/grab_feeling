@@ -2,9 +2,9 @@
 require_relative '../db.rb'
 
 class Room < ActiveRecord::Base
-  has_many :players, dependent: :destroy
-  has_many :statuses
-  has_many :logs
+  has_many :players, dependent: :delete_all
+  has_many :statuses, dependent: :delete_all
+  has_many :logs, dependent: :delete_all
   has_one :drawer, :class_name => "Player", :foreign_key => "drawer_id"
 
   validates_uniqueness_of :unique_id
