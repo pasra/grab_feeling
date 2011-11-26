@@ -2,3 +2,4 @@
 config.yml
 vendor/
 .bundle/
+public/js/

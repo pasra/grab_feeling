@@ -10,7 +10,24 @@ end
 desc 'Execute seed script'
 task 'db:seed' do
   puts 'Initializing Database...'
+  # to be implemented?!
 end
 
 desc 'Set up database'
 task 'db:setup' => %w(db:migrate db:seed)
+
+desc 'Compile coffeescripts into javascript files'
+task 'coffee' do
+  require 'coffee_script'
+  coffees = Dir["#{File.dirname(__FILE__)}/views/*.coffee"]
+  dir = "#{File.dirname(__FILE__)}/public/js/"
+  javascripts = coffees.map do |coffee|
+    File.basename(coffee).sub(/\.coffee$/,".js").prepend(dir)
+  end
+
+  Dir.mkdir(dir) unless File.exists?(dir)
+  coffees.zip(javascripts).each do |coffee,javascript|
+    puts "#{coffee.sub(File.dirname(__FILE__)+"/","")} -> #{javascript.sub(File.dirname(__FILE__)+"/","")}"
+    File.write javascript, CoffeeScript.compile(open(coffee))
+  end
+end

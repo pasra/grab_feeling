@@ -184,5 +184,12 @@ module GrabFeeling
 
       json.to_json
     end
+
+    if development?
+      require 'coffee_script'
+      get '/js/grab_feeling.js' do
+        coffee :grab_feeling
+      end
+    end
   end
 end
