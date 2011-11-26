@@ -112,6 +112,12 @@ $(document).ready ->
       $("#chat_field").val("")
     false
 
+  $("input.color_button").each (i,v) -> $(v).click ->
+    drawing_option.color = $(v).attr('id').replace('color_','')
+
+  $(".width_button").each (i,v) -> $(v).click ->
+    drawing_option.width = $(v).attr('id').replace('width_','')
+
   $.getJSON("#{location.pathname}.json", (data) ->
     if data.error
       add_system_log "Error: #{data.error}"
