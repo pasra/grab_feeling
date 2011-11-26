@@ -1,7 +1,11 @@
 database:
   development:
-    adapter: sqlite3
-    database: db/development.sqlite
+#   adapter: sqlite3
+#   database: db/development.sqlite
+    adapter: mysql2
+    database: grab_feeling
+    username: root
+    password: password
   production:
     adapter: sqlite3
     database: db/production.sqlite
@@ -9,11 +13,12 @@ database:
 key_salt: insertsalthere
 
 url:
-  websocket: http://localhost:4567/
+  websocket: http://localhost:4568/
+  ws: ws://localhost:4569/
 
 websocket:
-  socket: /tmp/the.sock
-  port: 4566
+# socket: /tmp/the.sock
+  port: 4569
   bind: 127.0.0.1
 
 operation:
