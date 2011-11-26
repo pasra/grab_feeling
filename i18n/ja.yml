@@ -23,6 +23,6 @@ ja:
     connected: 接続しました
     loading: キャンバスを読み込んでいます...
     loaded: 読み込みました
-  player_joined: "%{tame} さんが参加しました"
+  player_joined: "%{name} さんが参加しました"
   player_left: "%{name} さんが退室しました"
   say: 発言
