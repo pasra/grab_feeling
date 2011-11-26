@@ -23,6 +23,18 @@ ja:
     connected: 接続しました
     loading: キャンバスを読み込んでいます...
     loaded: 読み込みました
+    color:
+      white: 白
+      black: 黒
+      green: 緑
+      red: 赤
+      blue: 青
+    width:
+      one: 太さ1
+      two: 太さ2
+      three: 太さ3
+      five: 太さ5
+      ten: 太さ10
   player_joined: "%{name} さんが参加しました"
   player_left: "%{name} さんが退室しました"
   say: 発言

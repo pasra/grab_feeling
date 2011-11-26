@@ -40,7 +40,7 @@ module GrabFeeling
       set :public_folder => Proc.new { File.join(root, 'public') }
       set :views => Proc.new { File.join(root, 'views') }
       set :default_locale, 'ja'
-      ::I18n.load_path += Dir["#{root}/i18n/*.yml"]
+      ::I18n.load_path = Dir["#{root}/i18n/*.yml"]
       use Rack::Session::Cookie,
         :expire_after => 60 * 60 * 24 * 12
     end
@@ -69,7 +69,6 @@ module GrabFeeling
                           [_[0].to_sym,1.0] : [_[0].to_sym,_[1].to_f] }
         locales.select! {|l| I18n.available_locales.include?(l[0]) }
         if locales.empty?
-          p :hi
           I18n.locale = Config["default_language"].to_sym || :ja
         else
           locales.sort_by! {|l| l[1] }.reverse!
