@@ -45,7 +45,7 @@ connect_websocket = ->
       when "system_log"
         add_system_log msg[room.locale]
       when "draw"
-        dbg msg
+        canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
 #      when "needs_token"
@@ -82,7 +82,9 @@ setup_canvas = ->
 
   $(canvas).mousemove (e) -> if ws && canvas.drawing && canvas.drawing_allowed
     point = canvas.pointer(e)
-    canvas.draw(canvas.old_point, point, width: 3, color: 'black')
+    option = {width: 3, color: 'black'}
+    ws.puts type: "draw", from: canvas.old_point, to: point, option: option
+    canvas.draw canvas.old_point, point, option
     canvas.old_point = point
 
   drawed = -> canvas.drawing = false
