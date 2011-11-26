@@ -23,9 +23,11 @@ connect_websocket = ->
       when "image"
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
+        canvas.drawing_allowed = true
       when "empty_image"
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
+        canvas.drawing_allowed = true
       when "image_request"
         dbg "Returning image"
         ws.puts type: "image", image: canvas.toDataURL("image/png")
@@ -54,9 +56,42 @@ connect_websocket = ->
     add_system_log "#{t('ui.closed')}: #{e}"
     dbg e
 
+setup_canvas = ->
+  canvas = $("#the_canvas")[0]
+
+  canvas.drawing = false
+  canvas.drawing_allowed = false
+
+  canvas.pointer = (e) ->
+    r = this.getBoundingClientRect()
+    {x: e.clientX - r.left, y: e.clientY - r.top}
+
+  canvas.draw = (from, to, option) ->
+    context = canvas.getContext("2d")
+    context.strokeStyle = option.color || 'red'
+    context.lineWidth = option.width || 1
+    context.beginPath()
+    context.moveTo(from.x, from.y)
+    context.lineTo(to.x, to.y)
+    context.stroke()
+    context.closePath()
+
+  $(canvas).mousedown (e) ->
+    canvas.drawing = true
+    canvas.old_point = canvas.pointer(e)
+
+  $(canvas).mousemove (e) -> if ws && canvas.drawing && canvas.drawing_allowed
+    point = canvas.pointer(e)
+    canvas.draw(canvas.old_point, point, width: 3, color: 'black')
+    canvas.old_point = point
+
+  drawed = -> canvas.drawing = false
+  $(canvas).mouseup drawed
+  $(canvas).mouseout drawed
 
 $(document).ready ->
-  canvas = $("#the_canvas")[0]
+  setup_canvas()
+
   add_system_log t('ui.retriving_data')
 
   $("#chat_form").submit ->
