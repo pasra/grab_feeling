@@ -20,6 +20,13 @@ module GrabFeeling
       end
     end
 
+    def load_transitions
+      @@transitions = Hash[Dir["#{self.class_eval{root}}/i18n/*.yml"].map { |file|
+        locale = File.basename(file)[0..-5]
+        [locale.to_sym, YAML.load_file(file)[locale].to_json.dup.prepend("window.locale = \"#{I18n.locale}\"; window.localization = ")]
+      }]
+    end
+
     configure :development do
       register Sinatra::Reloader
       also_reload "#{File.dirname(__FILE__)}/**/*.rb"
@@ -38,8 +45,15 @@ module GrabFeeling
         :expire_after => 60 * 60 * 24 * 12
     end
 
+    configure :production, :test do
+      load_transitions
+    end
+
     before do
-      I18n.reload! if development?
+      if development?
+        I18n.reload!
+        load_transitions
+      end
 
       if params[:locale]
         locale = params[:locale].to_sym
@@ -53,8 +67,9 @@ module GrabFeeling
         locales = request.env['HTTP_ACCEPT_LANGUAGE'].split(/, ?/)
         locales.map! {|l| (_ = l.split(/;q=/)).size == 1 ? \
                           [_[0].to_sym,1.0] : [_[0].to_sym,_[1].to_f] }
-        locales.select! {|l| I18n.available_locales.include? l[0] }
+        locales.select! {|l| I18n.available_locales.include?(l[0]) }
         if locales.empty?
+          p :hi
           I18n.locale = Config["default_language"].to_sym || :ja
         else
           locales.sort_by! {|l| l[1] }.reverse!
@@ -115,12 +130,33 @@ module GrabFeeling
       end
     end
 
+    get '/g/:id.json' do
+      content_type :json
+
+      @room = Room.find_by_unique_id(params[:id])
+      return halt(404) unless @room
+      return {error: "Who are you?"}.to_json unless session[@room.session_key]
+
+      @player = @room.players.find_by_id(session[@room.session_key])
+      return {error: "Who are you? wrong id?"}.to_json unless @player
+
+      json = {locale: I18n.locale, system_logs: @room.statuses(true).map{|l| {en: l.en, ja: l.ja } },
+              logs: @room.logs(true).map{|l| {message: l.text, name: l.player.name, player_id: l.player.id} },
+              players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point, you: pl.id == @player.id} },
+              token: @player.token, debug: development?, websocket: Config["url"]["ws"],
+              player_id: @player.id}
+
+      json.to_json
+    end
+
     get '/g/:id' do
       @room = Room.find_by_unique_id(params[:id])
       return halt(404) unless @room
 
       if session[@room.session_key]
         @player = Player.find_by_id(session[@room.session_key])
+        @transition = @@transitions[I18n.locale] || @@transitions[Config["default_language"].to_sym]
+        Communicator.notify :hi
         haml :room
       else
         haml :room_entrance
@@ -164,31 +200,18 @@ module GrabFeeling
 
         redirect "/"
       else
-        redirect "/g/#{@room.id}"
+        redirect "/g/#{@room.unique_id}"
       end
-    end
-
-    get '/g/:id.json' do
-      @room = Room.find_by_unique_id(params[:id])
-      return halt(404) unless @room
-      return redirect("/g/#{@room.unique_id}") unless session[@room.session_key]
-
-      @player = @room.players.find_by_id(session[@room.session_key])
-      return halt(403) unless @player
-
-      content_type :json
-      json = {locale: I18n.locale, system_logs: @room.statuses(true).map{|l| {en: l.en, ja: l.ja } },
-              logs: @room.logs(true).map{|l| {text: l.text, name: l.player.name, player_id: l.player.id} },
-              players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point} },
-              token: @player.token}
-
-      json.to_json
     end
 
     if development?
       require 'coffee_script'
       get '/js/grab_feeling.js' do
         coffee :grab_feeling
+      end
+
+      get '/js/i18n.js' do
+        coffee :i18n
       end
     end
   end

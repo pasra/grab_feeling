@@ -23,17 +23,28 @@ module GrabFeeling
       @@websocket = block
     end
 
-    def ws_broadcast(room_id, msg={})
+    def self.ws_broadcast(room_id, msg={})
       message = msg.to_json
+      @@logger.info("broadcasting to #{room_id}: #{msg}")
+      p room_id
       @@pool.find_by_room_id(room_id).each do |pid,player|
+        @@logger.info("broadcasting to #{pid} @ #{room_id}")
         player[:socket].send message
       end
     end
 
     hook_event :join do |msg|
+      ws_broadcast msg["room_id"], {type: :join, player_id: msg["player_id"],
+                                   player_name: msg["player_name"]}
     end
 
     hook_event :leave do |msg|
+      ws_broadcast msg["room_id"], {type: :leave, player_id: msg["player_id"],
+                                   player_name: msg["player_name"]}
+    end
+
+    hook_event :system_log do |msg|
+      ws_broadcast msg["room_id"], msg
     end
 
     websocket do |ws|
@@ -60,48 +71,55 @@ module GrabFeeling
         json = JSON.parse(msg)
         @@logger.debug("#{ws.__id__}: json -> #{json}")
 
-        ActiveRecord::Base.connection_pool.with_connection do
-          i =  @@pool.find_by_socket(ws)
-          case json["type"]
-          when "image_request"
-            @@logger.info("#{ws.__id__} requested a image...")
+        begin
+          ActiveRecord::Base.connection_pool.with_connection do ActiveRecord::Base.transaction do
+            i =  @@pool.find(ws)
+            break unless i
+            case json["type"]
+            when "image_request"
+              @@logger.info("#{ws.__id__} requested a image...")
 
-            players = (@@pool.find_by_room_id(i[:room_id]) - i)
-            if players.empty?
-              ws.send({type: "empty_image"})
-              break
-            end
-            uploader = players.sample
-
-            @@logger.error("#{ws.__id__} uploader == me?!") if uploader[:player_id] == i[:player_id]
-
-            @@image_requests[i[:room_id]] ||= {requester: [], buffer: []}
-            @@image_requests[i[:room_id]][:requester] << ws
-
-            uploader[:socket].send({type: "image_request"}.to_json)
-            ws.send({type: "image_requested"}.to_json)
-          when"image"
-            if @@image_requests[i[:room_id]]
-              @@logger.info("#{ws.__id__} returned a image")
-              message = {type: "image", image: json["image"], buffer: @@image_requests[i[:room_id]][:buffer]}.to_json
-              @@image_requests.delete i[:room_id]
-              @@image_requests[i[:room_id]][:requester].each do |sock|
-                sock.send message
+              players = (@@pool.find_by_room_id(i[:room_id]).values - [i]).select{|x| x[:loaded]}
+              if players.empty?
+                ws.send({type: "empty_image"}.to_json)
+                break
               end
+              uploader = players.sample
+
+              @@logger.error("#{ws.__id__} uploader == me?!") if uploader[:player_id] == i[:player_id]
+
+              @@image_requests[i[:room_id]] ||= {requester: [], buffer: []}
+              @@image_requests[i[:room_id]][:requester] << ws
+
+              uploader[:socket].send({type: "image_request"}.to_json)
+              ws.send({type: "image_requested"}.to_json)
+            when "image"
+              if @@image_requests[i[:room_id]]
+                _ = @@image_requests.delete(i[:room_id])
+                @@logger.info("#{ws.__id__} returned a image")
+                message = {type: "image", image: json["image"], buffer: _[:buffer]}.to_json
+                _[:requester].each do |sock|
+                  sock.send message
+                end
+              end
+            when "image_loaded"
+              i[:loaded] = true
+            when "chat"
+              @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
+              ws_broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
+            when "draw"
+              json["player_id"] = i[:player_id]
+              @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
+              ws_broadcast i[:room_id], json
+            when "start"
+            when "kick"
+            when "skip"
+            when "deop"
+            when "op"
             end
-          when "chat"
-            @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
-            ws_broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
-          when "draw"
-            json["player_id"] = i[:player_id]
-            @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
-            ws_broadcast i[:room_id], json
-          when "start"
-          when "kick"
-          when "skip"
-          when "deop"
-          when "op"
-          end
+          end end
+        rescue Exception
+          @@logger.error "#{$!.class}: #{$!.message}\n#{$!.backtrace.join("\n")}"
         end
       end
 
@@ -118,6 +136,7 @@ module GrabFeeling
 
     configure :development do
       register Sinatra::Reloader
+      also_reload "#{File.dirname(__FILE__)}/**/*.rb"
     end
 
     configure do
@@ -134,9 +153,15 @@ module GrabFeeling
       obj = JSON.parse(request.body.read)
       name = params[:name].to_sym
       EM.defer do
-        @@logger.info("Event received: #{name}")
-        (@@event_hooks[name] ||= []).each{|x| x[obj] }
+        begin
+          @@logger.info("Event received: #{name}")
+          p obj
+          (@@event_hooks[name] ||= []).each{|x| x[obj] }
+        rescue Exception
+          @@logger.error "#{$!.class}: #{$!.message}\n#{$!.backtrace.join("\n")}"
+        end
       end
+      ""
     end
   end
 end
