@@ -3,8 +3,21 @@
   %head
     %meta{charset: "UTF-8"}
     %title= t(:title)
+    %script{type: "text/javascript"}= @transition
+    - if GrabFeeling::Config["jquery"]
+      %script{src: GrabFeeling::Config["jquery"]}
+    - else
+      %script{src: "http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"}
+    %script{src: "/js/i18n.js"}
+    %script{src: "/js/grab_feeling.js"}
   %body
+    %canvas#the_canvas{width: 800, height: 600}
+    %div.log#system_log
+    %div#chat
+      %div.log#chat_log
+      %form#chat_form{action: "#"}
+        %input#chat_field{type: 'text', size: '40'}
+        %input{type: 'submit', value: t(:say), disabled: true}
     %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
-      %p
-        %input{type: "submit", name: "leave", value: t(:leave)}
+      %input{type: "submit", name: "leave", value: t(:leave)}
 
