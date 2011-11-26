@@ -4,6 +4,7 @@ ja:
   room_list: ルームリスト
   room:
     name: ルーム名
+    info: ルーム情報
     players: プレイヤー
     viewers: 感染者
     listed: ルームリストに表示
@@ -12,3 +13,16 @@ ja:
     watch_key: 観戦パスワード
     submit: ルームを作成
     join_view: 参加/観戦
+  player:
+    name: 名前
+  your_info: あなたの情報
+  leave: 退室
+  ui:
+    retriving_data: ルーム情報を取得しています
+    connecting: ゲームサーバーに接続しています...
+    connected: 接続しました
+    loading: キャンバスを読み込んでいます...
+    loaded: 読み込みました
+  player_joined: "%{tame} さんが参加しました"
+  player_left: "%{name} さんが退室しました"
+  say: 発言
