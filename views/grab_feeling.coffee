@@ -7,6 +7,7 @@ add_chat_log = (name, message) -> $("#chat_log").append($("<p>").text("#{name}: 
 
 room = undefined
 canvas = undefined
+drawing_option = {width: 3, color: 'black'}
 ws = undefined
 
 connect_websocket = ->
@@ -92,9 +93,8 @@ setup_canvas = ->
 
   $(canvas).mousemove (e) -> if ws && canvas.drawing && canvas.drawing_allowed
     point = canvas.pointer(e)
-    option = {width: 3, color: 'black'}
-    ws.puts type: "draw", from: canvas.old_point, to: point, option: option
-    canvas.draw canvas.old_point, point, option
+    ws.puts type: "draw", from: canvas.old_point, to: point, option: drawing_option
+    canvas.draw canvas.old_point, point, drawing_option
     canvas.old_point = point
 
   drawed = -> canvas.drawing = false
