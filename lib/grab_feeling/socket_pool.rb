@@ -22,7 +22,7 @@ module GrabFeeling
 
     def add(room_id, player_id, socket)
       player = Player.find_by_id(player_id)
-      obj = {socket: socket, room_id: room_id, player_id: player_id}
+      obj = {socket: socket, room_id: room_id, player_id: player_id, loaded: false}
       obj[:name] = player ? player.name : "???"
       @pool[room_id] ||= {}
       @pool[room_id][player_id] = obj
