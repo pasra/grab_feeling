@@ -14,7 +14,7 @@ module GrabFeeling
                  {host: Config["websocket"]["host"] || "0.0.0.0",
                   port: Config["websocket"]["port"] || 4566}
                end
-      EM.defer { EM::WebSocket.start(ws_opt, &@@websocket) }
+      EM.defer { EM::WebSocket.start(ws_opt, &(development? ? ->(ws){@@websocket[ws]} : @@websocket)) }
     end
   end
 end
