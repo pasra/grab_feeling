@@ -21,9 +21,18 @@ connect_websocket = ->
     dbg msg
     switch msg.type
       when "image"
-        add_system_log t('ui.loaded')
-        ws.puts type: "image_loaded"
-        canvas.drawing_allowed = true
+        image = new Image()
+        image.onload = ->
+          context = canvas.getContext("2d")
+          context.clearRect(0, 0, canvas.width, canvas.height)
+          context.drawImage(image, 0, 0, image.width, image.height)
+          draw buf.from, buf.to, buf.option for buf in msg.buffer
+
+          add_system_log t('ui.loaded')
+          ws.puts type: "image_loaded"
+          canvas.drawing_allowed = true
+
+        image.src = msg.image
       when "empty_image"
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
@@ -45,7 +54,8 @@ connect_websocket = ->
       when "system_log"
         add_system_log msg[room.locale]
       when "draw"
-        canvas.draw msg.from, msg.to, msg.option
+        unless room.player_id == msg.player_id
+          canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
 #      when "needs_token"
