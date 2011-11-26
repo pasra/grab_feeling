@@ -14,7 +14,7 @@ class Room < ActiveRecord::Base
   end
 
   def add_system_log *args
-    obj = {room_id: self.id}
+    obj = {room_id: self.id, type: :system_log}
     I18n.available_locales.each do |locale|
       I18n.with_locale locale do
         obj[locale] = I18n.t(*args)
