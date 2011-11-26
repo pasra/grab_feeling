@@ -1,0 +1,10 @@
+!!! 5
+%html
+  %head
+    %meta{charset: "UTF-8"}
+    %title= t(:title)
+  %body
+    %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
+      %p
+        %input{type: "submit", name: "leave", value: t(:leave)}
+

@@ -7,8 +7,11 @@ require_relative './helper'
 
 module GrabFeeling
   class App < Sinatra::Base
+
     def call(env)
-      ActiveRecord::Base.connection_pool.with_connection { dup.call!(env) }
+      ActiveRecord::Base.connection_pool.with_connection { ActiveRecord::Base.transaction {
+        dup.call!(env)
+      } }
     end
 
     helpers do
@@ -19,6 +22,7 @@ module GrabFeeling
 
     configure :development do
       register Sinatra::Reloader
+      also_reload "#{File.dirname(__FILE__)}/**/*.rb"
     end
 
     configure do
@@ -63,7 +67,7 @@ module GrabFeeling
     end
 
     get '/' do
-      @rooms = Room.all
+      @rooms = Room.where(listed: true)
       haml :index
     end
 
@@ -72,13 +76,16 @@ module GrabFeeling
     end
 
     post '/create' do
-      room = params[:room].dup
-      room[:watchable] = (room[:watchable] == '1')
-      room[:listed] = (room[:listed] == '1')
-      room[:join_key].empty? ? room.delete(:join_key) :
-        room[:join_key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[:join_key])
-      room[:watch_key].empty? ? room.delete(:watch_key) :
-        room[:watch_key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[:watch_key])
+      room = Hash[params[:room].map{|k,v| [k.to_sym,v] }]
+
+      [:watchable, :listed].each do |key|
+        room[key] = (room[key] == '1')
+      end
+
+      [:join_key, :watch_key].each do |key|
+        room[key] && room[key].empty? ? room.delete(key) :
+          room[key] = Digest::SHA1.hexdigest(Config["key_salt"]+room[key])
+      end
 
       room.delete(:drawer_id)
       room.delete(:unique_id)
@@ -91,7 +98,7 @@ module GrabFeeling
 
       @room = Room.new(room)
 
-      if @room.save
+      if params[:player][:name] && @room.save
         uid_a = Digest::SHA1.hexdigest("#{@room.id}#{Time.now.to_f}#{rand}").chars.to_a
         uid = [6.times.map{ uid_a.shift }.join]+uid_a
         @room.unique_id = uid.inject do |r,i|
@@ -101,6 +108,7 @@ module GrabFeeling
           end
         end
         @room.save!
+        raise "!?" unless create_player(@room, params[:player][:name])
         redirect "/g/#{@room.unique_id}"
       else
         haml :create
@@ -124,19 +132,9 @@ module GrabFeeling
       return halt(404) unless @room
       return redirect("/g/#{@room.unique_id}") if session[@room.session_key]
 
-      player = params[:player].dup
-      player[:token] = Digest::SHA1.hexdigest(3.times.map{rand(100000000000)}.join)
-      @player = @room.players.build(player)
+      @auth = @room.join_key ? (params[:room][:join_key] && @room.join_key == Digest::SHA1.hexdigest(Config["key_salt"]+params[:room][:join_key])) : true
 
-      if @player.save
-        if @room.players[0].id == @player.id
-          @player.admin = true
-          @player.save!
-        end
-        session[@room.session_key] = @player.id
-        Communicator.notify :join, room_id: @room.id, player_id: @player.id,
-                                   player_name: @player.name
-        room.add_system_log :player_joined, name: @player.name
+      if @auth && create_player(@room, params[:player][:name])
         redirect "/g/#{@room.unique_id}"
       else
         haml :room_entrance
@@ -148,16 +146,20 @@ module GrabFeeling
       return halt(404) unless @room
       return redirect("/g/#{@room.unique_id}") unless session[@room.session_key]
 
-      @player = Player.find_by_id(session[@room.session_key])
-      @room.players.delete(@player, :dependent => :destroy)
+      @player = @room.players.find_by_id(session[@room.session_key])
+      return halt(403) unless @player
+
+      @room.players.delete @player
       session[@room.session_key] = nil
       Communicator.notify :leave, room_id: @room.id, player_id: @player.id,
                                  player_name: @player.name
-      room.add_system_log :player_left, name: @player.name
+      @room.add_system_log :player_left, name: @player.name
+
       if @room.players.find(:all, :conditions => ['admin = true']).empty?
         @room.ended = true
         @room.save!
 
+        @room.add_system_log :room_end
         Communicator.notify :room_end, room_id: @room.id
 
         redirect "/"
@@ -171,10 +173,14 @@ module GrabFeeling
       return halt(404) unless @room
       return redirect("/g/#{@room.unique_id}") unless session[@room.session_key]
 
+      @player = @room.players.find_by_id(session[@room.session_key])
+      return halt(403) unless @player
+
       content_type :json
       json = {locale: I18n.locale, system_logs: @room.statuses(true).map{|l| {en: l.en, ja: l.ja } },
               logs: @room.logs(true).map{|l| {text: l.text, name: l.player.name, player_id: l.player.id} },
-              players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point} }}
+              players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point} },
+              token: @player.token}
 
       json.to_json
     end

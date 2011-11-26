@@ -5,6 +5,7 @@
     %title= t(:title)
   %body
     %form{action: "/create", method: "POST"}
+      %h2= t(:'room.info')
       %p
         %b= t(:'room.name')
         %input{type: "text", size: "40", name: "room[name]"}
@@ -20,6 +21,10 @@
       %p
         %b= t(:'room.watch_key')
         %input{type: "password", size: "40", name: "room[watch_key]"}
+      %h2= t(:your_info)
+      %p
+        %b= t(:'player.name')
+        %input{type: "text", size: "40", name: "player[name]"}
       %p
         %input{type: "submit", value: t(:'room.submit')}
 

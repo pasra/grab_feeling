@@ -1,0 +1,26 @@
+!!! 5
+%html
+  %head
+    %meta{charset: "UTF-8"}
+    %title= t(:title)
+  %body
+    %form{action: "/g/#{@room.unique_id}/join", method: "POST"}
+      %h2= t(:join)
+      %p
+        %b= t(:'player.name')
+        %input{type: "text", size: "40", name: "player[name]"}
+      - if @room.join_key
+        %p
+          %b= t(:'room.join_key')
+          %input{type: "password", size: "40", name: "room[join_key]"}
+      %p
+        %input{type: "submit", name: "join", value: t(:join)}
+      - if @room.watchable
+        %h2= t(:watch)
+        - if @room.watch_key
+          %p
+            %b= t(:'room.watch_key')
+            %input{type: "password", size: "40", name: "room[watch_key]"}
+        %p
+          %input{type: "submit", name: "watch", value: t(:watch)}
+
