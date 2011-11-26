@@ -27,6 +27,7 @@ class TheMigration < ActiveRecord::Migration
 
     create_table :logs do |t|
       t.string :text
+      t.string :name
       t.integer :player_id
       t.integer :room_id
     end

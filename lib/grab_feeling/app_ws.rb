@@ -107,6 +107,7 @@ module GrabFeeling
             when "chat"
               @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
               ws_broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
+              Room.find_by_id(i[:room_id]).logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
             when "draw"
               json["player_id"] = i[:player_id]
               @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]

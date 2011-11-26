@@ -141,7 +141,7 @@ module GrabFeeling
       return {error: "Who are you? wrong id?"}.to_json unless @player
 
       json = {locale: I18n.locale, system_logs: @room.statuses(true).map{|l| {en: l.en, ja: l.ja } },
-              logs: @room.logs(true).map{|l| {message: l.text, name: l.player.name, player_id: l.player.id} },
+              logs: @room.logs(true).map{|l| {message: l.text, name: l.name, player_id: (l.player && l.player.id)} },
               players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point, you: pl.id == @player.id} },
               token: @player.token, debug: development?, websocket: Config["url"]["ws"],
               player_id: @player.id}
