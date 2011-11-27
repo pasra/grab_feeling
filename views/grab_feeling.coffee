@@ -12,6 +12,7 @@ add_chat_log = (name, message) ->
 
 room = undefined
 canvas = undefined
+context = undefined
 drawing_option = {width: 3, color: 'black'}
 ws = undefined
 
@@ -40,7 +41,6 @@ connect_websocket = ->
           image.onload = ->
             canvas.clear()
 
-            context = canvas.getContext("2d")
             context.drawImage(image, 0, 0, image.width, image.height)
             draw_buffer()
 
@@ -82,6 +82,7 @@ connect_websocket = ->
 
 setup_canvas = ->
   canvas = $("#the_canvas")[0]
+  context = canvas.getContext("2d") 
 
   canvas.drawing = false
   canvas.drawing_allowed = false
@@ -91,11 +92,9 @@ setup_canvas = ->
     {x: e.clientX - r.left, y: e.clientY - r.top}
 
   canvas.clear = ->
-    context = canvas.getContext("2d")
     context.clearRect(0, 0, canvas.width, canvas.height)
 
   canvas.draw = (from, to, option) ->
-    context = canvas.getContext("2d")
     context.strokeStyle = option.color || 'red'
     context.lineWidth = option.width || 1
     context.lineCap = "round"
