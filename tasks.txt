@@ -1,0 +1,5 @@
+* Show player lists
+* Create game scheduler (GM)
+* ping timeout
+* room GC
+* pckle
