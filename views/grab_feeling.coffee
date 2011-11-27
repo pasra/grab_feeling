@@ -98,6 +98,7 @@ setup_canvas = ->
     context = canvas.getContext("2d")
     context.strokeStyle = option.color || 'red'
     context.lineWidth = option.width || 1
+    context.lineCap = "round"
     context.beginPath()
     context.moveTo(from.x, from.y)
     context.lineTo(to.x, to.y)
