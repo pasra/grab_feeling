@@ -6,6 +6,7 @@ class Room < ActiveRecord::Base
   has_many :statuses, dependent: :delete_all
   has_many :logs, dependent: :delete_all
   has_one :drawer, :class_name => "Player", :foreign_key => "drawer_id"
+  has_one :next_drawer, :class_name => "Player", :foreign_key => "next_drawer_id"
 
   validates_uniqueness_of :unique_id
 
