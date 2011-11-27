@@ -2,8 +2,13 @@ debug = false
 dbg = (a) ->
   console.log(a) if debug
 
-add_system_log = (str) -> $("#system_log").append($("<p>").text(str))
-add_chat_log = (name, message) -> $("#chat_log").append($("<p>").text("#{name}: #{message}"))
+add_system_log = (str) ->
+  $("#system_log").append($("<p>").text(str))
+  $("#system_log")[0].scrollTop = $("#system_log")[0].scrollHeight
+
+add_chat_log = (name, message) ->
+  $("#chat_log").append($("<p>").text("#{name}: #{message}"))
+  $("#chat_log")[0].scrollTop = $("#chat_log")[0].scrollHeight
 
 room = undefined
 canvas = undefined

@@ -10,14 +10,17 @@
       %script{src: "http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"}
     %script{src: "/js/i18n.js"}
     %script{src: "/js/grab_feeling.js"}
+    %link{rel: "stylesheet", type: "text/css", href: "/css/grab_feeling.css"}
   %body
-    %canvas#the_canvas{width: 800, height: 600}
-    %div.log#system_log
-    %div#chat
-      %div.log#chat_log
-      %form#chat_form{action: "#"}
-        %input#chat_field{type: 'text', size: '40'}
-        %input{type: 'submit', value: t(:say), disabled: true}
+    %canvas#the_canvas{width: 750, height: 550}
+    %div#logs
+      %div.log#system_log
+      %div#chat
+        %div.log#chat_log
+        %form#chat_form{action: "#"}
+          %input#chat_field{type: 'text', size: '40'}
+          %input{type: 'submit', value: t(:say), disabled: true}
+    %div#clear
     %div#buttons
       %p
         %input.color_button#color_black{type: 'button', value: t(:'ui.color.black')}
