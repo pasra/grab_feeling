@@ -3,3 +3,4 @@
 * ping timeout
 * room GC
 * pckle
+* limit log transferring [-5..-1]?
