@@ -68,6 +68,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   coffee-script
+  coffee-script-source
   em-http-request
   em-websocket
   eventmachine
