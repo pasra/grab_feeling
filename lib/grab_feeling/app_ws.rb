@@ -70,9 +70,10 @@ module GrabFeeling
         json = JSON.parse(msg)
         @@logger.debug("#{ws.__id__}: json -> #{json}")
 
+        i =  @@pool.find(ws)
+
         begin
           ActiveRecord::Base.connection_pool.with_connection do ActiveRecord::Base.transaction do
-            i =  @@pool.find(ws)
             break unless i
             case json["type"]
             when "image_request"
@@ -108,20 +109,24 @@ module GrabFeeling
             when "image_loaded"
               i[:loaded] = true
             when "chat"
+              room = Room.find_by_id(i[:room_id])
+
               @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
               ws_broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
-              Room.find_by_id(i[:room_id]).logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
+              room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
             when "draw"
               json["player_id"] = i[:player_id]
               @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
               ws_broadcast i[:room_id], json
             when "clear"
+              room = Room.find_by_id(i[:room_id])
+
               json["player_id"] = i[:player_id]
               if @@image_requests[i[:room_id]]
                 @@image_requests[i[:room_id]][:buffer] = []
                 @@image_requests[i[:room_id]][:clear] = true
               end
-              Room.find_by_id(i[:room_id]).add_system_log :cleared, name: i[:name]
+              room.add_system_log :cleared, name: i[:name]
               ws_broadcast i[:room_id], json
             when "start"
             when "kick"
