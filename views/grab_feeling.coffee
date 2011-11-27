@@ -139,6 +139,9 @@ $(document).ready ->
   $("#clear_button").click ->
     ws.puts type: "clear"
 
+  $("#snapshot").click ->
+    window.open(canvas.toDataURL("image/png"))
+
   $.getJSON("#{location.pathname}.json", (data) ->
     if data.error
       add_system_log "Error: #{data.error}"

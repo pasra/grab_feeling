@@ -36,6 +36,7 @@ ja:
       five: 太さ5
       ten: 太さ10
     clear: クリア
+    snapshot: スナップショット
   player_joined: "%{name} さんが参加しました"
   player_left: "%{name} さんが退室しました"
   say: 発言
