@@ -5,7 +5,7 @@ module GrabFeeling
   module Config
     @@yaml = nil
     SAMPLE_CONFIG = File.expand_path("#{File.dirname(__FILE__)}/../../config.sample.yml")
-    CONFIG_FILE = File.expand_path("#{File.dirname(__FILE__)}/../../sample.yml")
+    CONFIG_FILE = File.expand_path("#{File.dirname(__FILE__)}/../../config.yml")
     class << self
       def [](x)
         yaml[x]
