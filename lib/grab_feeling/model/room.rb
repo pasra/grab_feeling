@@ -8,6 +8,8 @@ class Room < ActiveRecord::Base
   has_one :drawer, :class_name => "Player", :foreign_key => "drawer_id"
   has_one :next_drawer, :class_name => "Player", :foreign_key => "next_drawer_id"
 
+  has_and_belongs_to_many :dictionaries
+
   validates_uniqueness_of :unique_id
 
   def session_key
