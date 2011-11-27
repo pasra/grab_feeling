@@ -212,6 +212,13 @@ module GrabFeeling
       get '/js/i18n.js' do
         coffee :i18n
       end
+
+      get '/haruharu' do
+        session.each do |k,v|
+          session[k] = nil
+        end
+        redirect '/'
+      end
     end
   end
 end
