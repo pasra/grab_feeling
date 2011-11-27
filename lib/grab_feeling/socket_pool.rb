@@ -13,7 +13,7 @@ module GrabFeeling
     end
 
     def find_by_room_id(room_id)
-      @pool[room_id]
+      @pool[room_id] || []
     end
 
     def find_by_player_id(player_id)

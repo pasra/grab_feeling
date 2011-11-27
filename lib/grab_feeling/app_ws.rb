@@ -26,7 +26,6 @@ module GrabFeeling
     def self.ws_broadcast(room_id, msg={})
       message = msg.to_json
       @@logger.info("broadcasting to #{room_id}: #{msg}")
-      p room_id
       @@pool.find_by_room_id(room_id).each do |pid,player|
         @@logger.info("broadcasting to #{pid} @ #{room_id}")
         player[:socket].send message
