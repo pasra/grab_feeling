@@ -60,8 +60,10 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
+        $("#player_list p").append("<div id=#{msg.player_id}>#{msg.player_name}</div>")
         dbg msg
       when "leave"
+        $("##{msg.player_id}").remove()
         dbg msg
       when "system_log"
         add_system_log msg[room.locale]
@@ -155,6 +157,11 @@ $(document).ready ->
     debug = data.debug
     room = data
     dbg data
+
+    player_list = $("#player_list p")
+    jQuery.each(room.players, (i, player) ->
+      player_list.append("<div id=#{player.id}>#{player.name}</div>")
+    )
 
     connect_websocket()
   ).error((xhr, text, e) -> add_system_log "oops? #{text} - #{e}")
