@@ -3,7 +3,7 @@ require 'grab_feeling/db'
 
 class TheMigration < ActiveRecord::Migration
   def self.up
-    create_table :rooms do |t|
+    create_table :rooms, :force => true do |t|
       t.string :name
       t.string :unique_id
 
@@ -26,7 +26,7 @@ class TheMigration < ActiveRecord::Migration
       t.integer :drawer_id
     end
 
-    create_table :logs do |t|
+    create_table :logs, :force => true do |t|
       t.string :text
       t.string :name
 
@@ -34,13 +34,13 @@ class TheMigration < ActiveRecord::Migration
       t.integer :room_id
     end
 
-    create_table :statuses do |t|
+    create_table :statuses, :force => true do |t|
       t.string :en
       t.string :ja
       t.integer :room_id
     end
 
-    create_table :players do |t|
+    create_table :players, :force => true do |t|
       t.string :name
       t.string :token
 
@@ -54,17 +54,17 @@ class TheMigration < ActiveRecord::Migration
       t.integer :room_id
     end
 
-    create_table :themes do |t|
+    create_table :themes, :force => true do |t|
       t.integer :dictionary_id
       t.string :text
     end
 
-    create_table :dictionaries do |t|
+    create_table :dictionaries, :force => true do |t|
       t.string :name
       t.boolean :official, :default => false
     end
 
-    create_table :rooms_dictionaries, :id => false do |t|
+    create_table :rooms_dictionaries, :id => false, :force => true do |t|
       t.integer :room_id
       t.integer :dictionary_id
     end
