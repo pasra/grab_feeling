@@ -60,7 +60,7 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        $("#player_list p").append("<span id=#{msg.player_id}>#{msg.player_name}(#{msg.player_point}) </span>")
+        $("#player_list p").append("<span id=#{msg.player_id}>#{msg.player_name}(#{msg.point}) </span>")
         dbg msg
       when "leave"
         $("##{msg.player_id}").remove()
