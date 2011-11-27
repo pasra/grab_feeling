@@ -115,9 +115,15 @@ module GrabFeeling
               ws_broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
             when "draw"
-              json["player_id"] = i[:player_id]
-              @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
-              ws_broadcast i[:room_id], json
+              room = Room.find_by_id(i[:room_id])
+
+              if room.drawer && room.drawer_id != i[:player_id]
+                ws.send({type: "draw_not_allowed"}.to_json)
+              else
+                json["player_id"] = i[:player_id]
+                @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
+                ws_broadcast i[:room_id], json
+              end
             when "clear"
               room = Room.find_by_id(i[:room_id])
 

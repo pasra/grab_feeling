@@ -24,7 +24,6 @@ class TheMigration < ActiveRecord::Migration
       t.integer :max_round, :default => 3
 
       t.integer :drawer_id
-      t.integer :next_drawer_id
     end
 
     create_table :logs do |t|
