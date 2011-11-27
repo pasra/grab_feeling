@@ -97,7 +97,11 @@ module GrabFeeling
               if @@image_requests[i[:room_id]]
                 _ = @@image_requests.delete(i[:room_id])
                 @@logger.info("#{ws.__id__} returned a image")
-                message = {type: "image", image: json["image"], buffer: _[:buffer]}.to_json
+                if _[:clear]
+                  message = {type: "image", buffer: _[:buffer], clear: true}.to_json
+                else
+                  message = {type: "image", image: json["image"], buffer: _[:buffer], clear: false}.to_json
+                end
                 _[:requester].each do |sock|
                   sock.send message
                 end
@@ -111,6 +115,13 @@ module GrabFeeling
             when "draw"
               json["player_id"] = i[:player_id]
               @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
+              ws_broadcast i[:room_id], json
+            when "clear"
+              json["player_id"] = i[:player_id]
+              if @@image_requests[i[:room_id]]
+                @@image_requests[i[:room_id]][:buffer] = []
+                @@image_requests[i[:room_id]][:clear] = true
+              end
               ws_broadcast i[:room_id], json
             when "start"
             when "kick"

@@ -18,7 +18,7 @@
       %form#chat_form{action: "#"}
         %input#chat_field{type: 'text', size: '40'}
         %input{type: 'submit', value: t(:say), disabled: true}
-    %div#color_buttons
+    %div#buttons
       %p
         %input.color_button#color_black{type: 'button', value: t(:'ui.color.black')}
         %input.color_button#color_red{type: 'button', value: t(:'ui.color.red')}
@@ -31,6 +31,8 @@
         %input.width_button#width_3{type: 'button', value: t('ui.width.three')}
         %input.width_button#width_5{type: 'button', value: t('ui.width.five')}
         %input.width_button#width_10{type: 'button', value: t('ui.width.ten')}
+      %p
+        %input#clear_button{type: 'button', value: t('ui.clear')}
     %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
       %input{type: "submit", name: "leave", value: t(:leave)}
 

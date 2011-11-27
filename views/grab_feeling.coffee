@@ -22,18 +22,24 @@ connect_websocket = ->
     dbg msg
     switch msg.type
       when "image"
-        image = new Image()
-        image.onload = ->
-          context = canvas.getContext("2d")
-          context.clearRect(0, 0, canvas.width, canvas.height)
-          context.drawImage(image, 0, 0, image.width, image.height)
+        draw_buffer = ->
           draw buf.from, buf.to, buf.option for buf in msg.buffer
-
           add_system_log t('ui.loaded')
           ws.puts type: "image_loaded"
           canvas.drawing_allowed = true
 
-        image.src = msg.image
+        if msg.clear
+          draw_buffer()
+        else
+          image = new Image()
+          image.onload = ->
+            canvas.clear()
+
+            context = canvas.getContext("2d")
+            context.drawImage(image, 0, 0, image.width, image.height)
+            draw_buffer()
+
+          image.src = msg.image
       when "empty_image"
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
@@ -59,6 +65,8 @@ connect_websocket = ->
           canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
+      when "clear"
+        canvas.clear()
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"
@@ -76,6 +84,10 @@ setup_canvas = ->
   canvas.pointer = (e) ->
     r = this.getBoundingClientRect()
     {x: e.clientX - r.left, y: e.clientY - r.top}
+
+  canvas.clear = ->
+    context = canvas.getContext("2d")
+    context.clearRect(0, 0, canvas.width, canvas.height)
 
   canvas.draw = (from, to, option) ->
     context = canvas.getContext("2d")
@@ -117,6 +129,9 @@ $(document).ready ->
 
   $(".width_button").each (i,v) -> $(v).click ->
     drawing_option.width = $(v).attr('id').replace('width_','')
+
+  $("#clear_button").click ->
+    ws.puts type: "clear"
 
   $.getJSON("#{location.pathname}.json", (data) ->
     if data.error
