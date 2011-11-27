@@ -121,6 +121,7 @@ module GrabFeeling
                 @@image_requests[i[:room_id]][:buffer] = []
                 @@image_requests[i[:room_id]][:clear] = true
               end
+              Room.find_by_id(i[:room_id]).add_system_log :cleared, name: i[:name]
               ws_broadcast i[:room_id], json
             when "start"
             when "kick"

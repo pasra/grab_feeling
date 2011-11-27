@@ -39,3 +39,4 @@ ja:
   player_joined: "%{name} さんが参加しました"
   player_left: "%{name} さんが退室しました"
   say: 発言
+  cleared: "%{name} さんがクリアしました"
