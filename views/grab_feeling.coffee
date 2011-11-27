@@ -82,7 +82,8 @@ connect_websocket = ->
 
 setup_canvas = ->
   canvas = $("#the_canvas")[0]
-  context = canvas.getContext("2d") 
+  context = canvas.getContext("2d")
+  context.lineCap = "round"
 
   canvas.drawing = false
   canvas.drawing_allowed = false
@@ -97,12 +98,11 @@ setup_canvas = ->
   canvas.draw = (from, to, option) ->
     context.strokeStyle = option.color || 'red'
     context.lineWidth = option.width || 1
-    context.lineCap = "round"
     context.beginPath()
     context.moveTo(from.x, from.y)
     context.lineTo(to.x, to.y)
     context.stroke()
-    context.closePath()
+    #context.closePath()
 
   $(canvas).mousedown (e) ->
     canvas.drawing = true
