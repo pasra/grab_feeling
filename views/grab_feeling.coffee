@@ -60,7 +60,7 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        $("#player_list p").append("<span id=#{msg.player_id}>#{msg.player_name} </span>")
+        $("#player_list p").append("<span id=#{msg.player_id}>#{msg.player_name}(#{msg.player_point}) </span>")
         dbg msg
       when "leave"
         $("##{msg.player_id}").remove()
@@ -160,7 +160,7 @@ $(document).ready ->
 
     player_list = $("#player_list p")
     jQuery.each(room.players, (i, player) ->
-      player_list.append("<span id=#{player.id}>#{player.name} </span>")
+      player_list.append("<span id=#{player.id}>#{player.name}(#{player.point}) </span>")
     )
 
     connect_websocket()
