@@ -34,22 +34,20 @@ class Room < ActiveRecord::Base
 
       theme = dictionary.where('id >= ?', rand(dictionary.count)).first
 
-      drawer = if is_first || !(last_round = self.rounds.last))
-                 self.players.first
-               elsif (next_player = last_round.drawer.next_player)
-                 next_player
-               else
-                 if (self.round + 1) > self.max_round
-                   self.round = 1
-                   self.in_game = false
-                   self.save!
-                   return nil
-                 else
-                   self.round += 1
-                   self.save!
-                   self.players.first
-                 end
-               end
+      if is_first || !(last_round = self.rounds.last)
+        drawer = self.players.first
+      elsif (next_player = last_round.drawer.next_player)
+        drawer = next_player
+      elsif (self.round + 1) > self.max_round
+        self.round = 1
+        self.in_game = false
+        self.save!
+        return nil
+      else
+        self.round += 1
+        self.save!
+        drawer = self.players.first
+      end
 
       time = Time.now
 
