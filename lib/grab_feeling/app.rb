@@ -122,7 +122,10 @@ module GrabFeeling
           else; break r
           end
         end
+
+        @room.dictionaries << Dictionary.first
         @room.save!
+
         raise "!?" unless create_player(@room, params[:player][:name])
         redirect "/g/#{@room.unique_id}"
       else
