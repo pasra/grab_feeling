@@ -29,6 +29,7 @@ class TheMigration < ActiveRecord::Migration
       t.datetime :next_at
 
       t.integer :opened, :default => 0
+      t.boolean :done, :default => false
 
       t.integer :theme_id
       t.integer :room_id
