@@ -22,11 +22,9 @@ module GrabFeeling
       end
 
       def after_load
-        if Config["theme_opening"] && Config["theme_opening"]["timing"]
-          timings = Config["theme_opening"]["timing"].to_a
-          Config["theme_opening"]["timing"] = timings.each_with_index.map do |t,i|
-            [t[0] - (i-1 > 0 ? timings[i-1][0] : 0), t[1]]
-          end
+        if Config["theme_opening"] && (timings = Config["theme_opening"]["timings"])
+          Config["theme_opening"]["timings"] = timings.to_a.sort_by(&:first).reverse
+          Config["theme_opening"]["timings"].map! {|(t,percent)| [t, percent/100.0] }
         end
       end
     end

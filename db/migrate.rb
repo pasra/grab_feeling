@@ -28,6 +28,8 @@ class TheMigration < ActiveRecord::Migration
       t.datetime :started_at
       t.datetime :next_at
 
+      t.integer :opened, :default => 0
+
       t.integer :theme_id
       t.integer :room_id
       t.integer :drawer_id

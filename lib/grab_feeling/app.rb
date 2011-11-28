@@ -30,6 +30,7 @@ module GrabFeeling
     configure :development do
       register Sinatra::Reloader
       also_reload "#{File.dirname(__FILE__)}/**/*.rb"
+      dont_reload "#{File.dirname(__FILE__)}/websocket_starter.rb"
     end
 
     configure do

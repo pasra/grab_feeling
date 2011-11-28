@@ -26,4 +26,25 @@ class Room < ActiveRecord::Base
     GrabFeeling::Communicator.notify :system_log, obj
     self
   end
+
+  def next_round(is_first=false)
+    ActiveRecord::Base.transaction do
+      dic_rand = rand(self.dictionaries.count)+self.dictionaries.first.id
+      dictionary = self.dictionaries.where('id >= ?', dic_rand)
+
+      theme = dictionary.where('id >= ?', rand(dictionary.count)).first
+
+      drawer = if is_first || !(last_round = self.rounds.last))
+                 self.players.first
+               else
+                 last_round.drawer.next_player
+               end
+
+      time = Time.now
+
+      self.rounds.create! topic: theme.text,
+                          theme_id: theme.id, drawer_id: drawer.id,
+                          started_at: time, next_at: time+Config["operation"]["turn"]
+    end
+  end
 end
