@@ -4,5 +4,14 @@
 * room GC
 * pckle
 * limit log transferring [-5..-1]?
+* topic is not saved? after reload it'll be ??????
 * unique themes
 * no wait before game ending
+
+リロードした時にトピックがはてな一色、書けないときでも書ける、
+クリアもできなくする
+色のパレットに白いれる
+選択色なおす
+音つける
+複数回答できなくする
+回答はトピックにもだす
