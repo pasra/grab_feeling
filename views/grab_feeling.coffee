@@ -83,6 +83,7 @@ connect_websocket = ->
       when "round"
         if drawer != room.player_id
           canvas.drawing_allowed = false
+        canvas.clear()
       when "round_end"
         canvas.drawing_allowed = true
       when "game_end"

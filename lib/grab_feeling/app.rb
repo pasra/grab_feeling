@@ -148,8 +148,14 @@ module GrabFeeling
               players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point, you: pl.id == @player.id} },
               token: @player.token, debug: development?, websocket: Config["url"]["ws"],
               player_id: @player.id, is_admin: @player.admin}
-      if (round = @room.rounds.last)
-        json[:topic] = round.drawer_id == @player.id ? round.theme.text : round.topic
+      if @room.in_game
+        if (round = @room.rounds.last)
+          json[:topic] = round.drawer_id == @player.id ? round.theme.text : round.topic
+        else
+          json[:topic] = ""
+        end
+      else
+        json[:topic] = ""
       end
 
       json.to_json

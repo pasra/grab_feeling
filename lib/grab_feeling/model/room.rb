@@ -62,7 +62,7 @@ class Room < ActiveRecord::Base
                                   started_at: time, next_at: next_at)
 
 
-      pool.broadcast_to self.id, type: :topic, topic: round.topic
+      pool.broadcast self.id, type: :topic, topic: round.topic
 
       if _=pool.find_by_player_id(drawer.id)
         _[:socket].send({type: :topic, topic: theme.text}.to_json)
