@@ -36,15 +36,32 @@ class Room < ActiveRecord::Base
 
       drawer = if is_first || !(last_round = self.rounds.last))
                  self.players.first
+               elsif (next_player = last_round.drawer.next_player)
+                 next_player
                else
-                 last_round.drawer.next_player
+                 if (self.round + 1) > self.max_round
+                   self.round = 1
+                   self.in_game = false
+                   self.save!
+                   return nil
+                 else
+                   self.round += 1
+                   self.save!
+                   self.players.first
+                 end
                end
 
       time = Time.now
 
+      next_at = if !next_player.next_player && (self.round + 1) > self.max_round
+                  time+Config["operation"]["turn"]
+                else
+                  time+Config["operation"]["turn"]+Config["operation"]["interval"]
+                end
+
       self.rounds.create! topic: Config["theme_opening"]["hider"] * theme.text.size,
                           theme_id: theme.id, drawer_id: drawer.id,
-                          started_at: time, next_at: time+Config["operation"]["turn"]
+                          started_at: time, next_at: next_at
     end
   end
 end
