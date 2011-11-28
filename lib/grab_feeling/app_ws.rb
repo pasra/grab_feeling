@@ -14,6 +14,8 @@ module GrabFeeling
     @@logger = Logger.new(STDOUT)
     @@websocket = ->{}
     @@image_requests = {}
+    @@timeout = Config["websocket"]["timeout"]
+    @@ping_interval = Config["websocket"]["ping_interval"]
 
     def self.hook_event(name,&block)
       (@@event_hooks[name] ||= []) << block
@@ -47,6 +49,14 @@ module GrabFeeling
     end
 
     websocket do |ws|
+      ping_timer = nil
+      timeout_check = nil
+
+      def ws.receive_data(msg)
+        @last_received = Time.now
+        super
+      end
+
       ws.onopen do
         @@logger.info("#{ws.__id__}: opened")
 
@@ -63,6 +73,18 @@ module GrabFeeling
           @@logger.info("#{ws.__id__}: Authorize failed")
           ws.send({type: "authorize_failed"}.to_json)
           ws.close_websocket
+        end
+
+        ping_timer = EM.add_periodic_timer(@@ping_interval) do
+          ws.instance_eval { @handler.send_frame(:ping, "PING") }
+        end
+
+        timeout_check = EM.add_periodic_timer(@@timeout) do
+          ws.instance_eval do
+            if !@last_received || (Time.now - @last_received) > @@timeout
+              close_connection
+            end
+          end
         end
       end
 
@@ -148,11 +170,15 @@ module GrabFeeling
 
       ws.onclose do
         @@pool.remove(ws)
+        ping_timer.cancel
+        timeout_check.cancel
         @@logger.info("#{ws.__id__}: closed")
       end
 
       ws.onerror do |e|
         @@pool.remove(ws)
+        ping_timer.cancel
+        timeout_check.cancel
         @@logger.error("#{ws.__id__}: closed (by error: #{e.message})")
       end
     end
