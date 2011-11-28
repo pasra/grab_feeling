@@ -10,7 +10,18 @@ end
 desc 'Execute seed script'
 task 'db:seed' do
   puts 'Initializing Database...'
-  # to be implemented?!
+
+  dictionary_files = Dir["#{File.dirname(__FILE__)}/dictionaries/*.txt"]
+
+  dictionary_files.each do |dictionary_file|
+    ActiveRecord::Base.transaction do
+      dic_lines = File.read(dictionary_file).split(/\r?\n/)
+      dictionary = Dictionary.create!(name: dic_lines.shift, official: true)
+      dic_lines.each do |line|
+        dictionary.themes.create! text: line.chomp
+      end
+    end
+  end
 end
 
 desc 'Set up database'
