@@ -108,7 +108,7 @@ module GrabFeeling
             when "draw"
               room = Room.find_by_id(i[:room_id])
 
-              if room.drawer && room.drawer_id != i[:player_id]
+              if (round = room.rounds.last) && round.drawer && round.drawer_id != i[:player_id]
                 ws.send({type: "draw_not_allowed"}.to_json)
               else
                 json["player_id"] = i[:player_id]
