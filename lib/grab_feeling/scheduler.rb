@@ -43,14 +43,13 @@ module GrabFeeling
         @rooms.each do |id,(room, flag)|
           round = room.rounds.last || room.next_round(@pool,true)
 
-        p round.next_at
-
           if flag || round.next_at < Time.now
             @rooms[id][1] = false
 
             # Round - next
             unless (round = room.next_round(@pool))
               # Game end
+              # TODO: ranking
               @rooms.delete(id)
               @pool.broadcast room.id, type: :game_end
               room.add_system_log :game_end

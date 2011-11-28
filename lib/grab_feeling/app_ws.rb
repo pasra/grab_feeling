@@ -119,9 +119,13 @@ module GrabFeeling
                 @@pool.broadcast i[:room_id], type: :correct, player_id: i[:player_id], point: point, answer: theme.text
                 round.next_at = Time.now+Config["operation"]["interval"]
                 round.save!
-                player = Player.find_by_id(i[:player_id])
-                player.point += point
-                player.save!
+
+                [round.drawer, Player.find_by_id(i[:player_id])].each do |player|
+                  player.point += point
+                  player.save!
+                  @@pool.broadcast room.id, type: :point, player_id: player.id, point: player.point
+                end
+
                 room.add_system_log :correct, name: i[:name], point: point
 
                 # TODO: DRY with scheduler.rb
@@ -130,9 +134,6 @@ module GrabFeeling
                                     next_drawer: (round.drawer.next_player || room.players.first).name,
                                     answer: round.theme.text
 
-
-                # TODO: notify point
-                # TODO: todo for answerer
                 # TODO: ignore drawer
               end
             when "draw"

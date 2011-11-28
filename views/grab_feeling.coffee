@@ -19,9 +19,8 @@ ws = undefined
 add_player = (player_id, name, point) ->
   $("#player_list").append $("<span>").attr('id',"player#{player_id}") \
                                       .text(name+"(") \
-                                      .append($("<span>").appendClass('point') \
-                                                         .text(point)) \
-                                      .append(")")
+                                      .append($("<span>").addClass('point') \
+                                                         .text(point)).append(")")
 
 connect_websocket = ->
   add_system_log t('ui.connecting')
@@ -88,6 +87,8 @@ connect_websocket = ->
         canvas.drawing_allowed = true
       when "game_end"
         canvas.drawing_allowed = true
+      when "point"
+        $("#player#{msg.player_id} .point").text(msg.point)
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"
