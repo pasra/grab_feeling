@@ -80,8 +80,9 @@ module GrabFeeling
             # next open
             elapsed = Time.now - round.started_at
             time, percent = Config["theme_opening"]["timings"].find{ |(t, percent)|
-                              elapsed > t } || Config["theme_opening"]["timings"].first
+                              elapsed > t } || [nil, nil]
 
+            next unless time
             next unless round.opened < time
 
             opened = round.topic
