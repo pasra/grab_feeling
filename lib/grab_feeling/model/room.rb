@@ -5,6 +5,7 @@ class Room < ActiveRecord::Base
   has_many :players, dependent: :delete_all
   has_many :statuses, dependent: :delete_all
   has_many :logs, dependent: :delete_all
+  has_many :rounds, dependent: :delete_all
   belongs_to :drawer, :class_name => "Player", :foreign_key => "drawer_id"
 
   has_and_belongs_to_many :dictionaries

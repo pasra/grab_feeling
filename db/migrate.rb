@@ -18,12 +18,18 @@ class TheMigration < ActiveRecord::Migration
 
       t.string :ws_server # for future use...
 
-      t.datetime :next_open
-      t.datetime :next_round
-
       t.integer :round, :default => 1
       t.integer :max_round, :default => 3
+    end
 
+    create_table :rounds, :force => true do |t|
+      t.string :topic
+
+      t.datetime :started_at
+      t.datetime :next_at
+
+      t.integer :theme_id
+      t.integer :room_id
       t.integer :drawer_id
     end
 
@@ -74,6 +80,7 @@ class TheMigration < ActiveRecord::Migration
     add_index :logs, :room_id
     add_index :players, :room_id
     add_index :themes, :dictionary_id
+    add_index :rounds, :room_id
   end
 
   def self.down
