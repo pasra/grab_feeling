@@ -25,6 +25,7 @@ operation:
   max_players: 10
   max_viewers: 10
   turn: 180 #sec
+  interval: 10 #sec
 
 theme_opening:
   hider: "?"
