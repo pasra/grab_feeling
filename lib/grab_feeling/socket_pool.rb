@@ -51,9 +51,7 @@ module GrabFeeling
 
     def broadcast_(ary, msg={})
       message = msg.to_json
-      @@logger.info("broadcasting to #{room_id}: #{msg}")
       ary.each do |pid,player|
-        @@logger.info("broadcasting to #{pid} @ #{room_id}")
         player[:socket].send message
       end
     end
