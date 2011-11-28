@@ -17,13 +17,20 @@ url:
   ws: ws://localhost:4569/
 
 websocket:
-# socket: /tmp/the.sock
   port: 4569
   bind: 127.0.0.1
+# socket: /tmp/the.sock
 
 operation:
   max_players: 10
-  max_viewers: 20
+  max_viewers: 10
   turn: 180 #sec
+
+theme_opening:
+  hider: "?"
+  timings:
+    60: 15
+    120: 25
+    150: 50
 
 default_language: ja
