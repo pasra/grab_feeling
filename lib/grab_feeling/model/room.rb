@@ -42,7 +42,7 @@ class Room < ActiveRecord::Base
 
       time = Time.now
 
-      self.rounds.create! topic: theme.text,
+      self.rounds.create! topic: Config["theme_opening"]["hider"] * theme.text.size,
                           theme_id: theme.id, drawer_id: drawer.id,
                           started_at: time, next_at: time+Config["operation"]["turn"]
     end

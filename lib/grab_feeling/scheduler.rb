@@ -33,7 +33,12 @@ module GrabFeeling
 
           # Round - timeout
           if round.next_at < Time.now
-            room.next_round
+            round = room.next_round
+            @pool.broadcast room.id, type: :topic, topic: round.topic.text
+            @pool.broadcast room.id, type: :round,
+                                     started_at: round.started_at,
+                                     next_at: round.next_at,
+                                     drawer: round.drawer.id
           end
 
           # next open
@@ -55,11 +60,11 @@ module GrabFeeling
               round.topic = opened
               round.opened = time
               round.save!
+              @pool.broadcast room.id, type: :topic, topic: opened
             end
           end
         end
       end
     end
-
   end
 end
