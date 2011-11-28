@@ -63,7 +63,7 @@ module GrabFeeling
             unless round.ends_at == round.next_at
               room.add_system_log :round_end,
                                   next_game: Time.now - round.next_at,
-                                  next_drawer: round.drawer.next_drawer.name
+                                  next_drawer: round.drawer.next_drawer.name,
                                   answer: round.theme.text
             else
               room.add_system_log :last_round_end, answer: round.theme.text
