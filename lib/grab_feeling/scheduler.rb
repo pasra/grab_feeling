@@ -52,6 +52,10 @@ module GrabFeeling
               # TODO: ranking
               @rooms.delete(id)
               @pool.broadcast room.id, type: :game_end
+              room.topic = ""
+              room.in_game = false
+              room.round = 1
+              room.save!
               room.add_system_log :game_end
             end
           elsif round.ends_at < Time.now

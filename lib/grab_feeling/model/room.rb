@@ -61,19 +61,18 @@ class Room < ActiveRecord::Base
                                   theme_id: theme.id, drawer_id: drawer.id,
                                   started_at: time, next_at: next_at)
 
+
+      pool.broadcast_to self.id, type: :topic, topic: round.topic
+
       if _=pool.find_by_player_id(drawer.id)
         _[:socket].send({type: :topic, topic: theme.text}.to_json)
       end
 
-      socket_wo_drawer = pool.find_by_room_id(self.id).reject do |k,pl|
-        pl[:player_id] == round.drawer.id
-      end
-
-      pool.broadcast_to socket_wo_drawer, type: :topic, topic: round.topic
       pool.broadcast self.id, type: :round,
                               started_at: round.started_at,
                               next_at: round.next_at,
                               drawer: round.drawer.id
+
       self.add_system_log :round_start, drawer: round.drawer.name
 
       round
