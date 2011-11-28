@@ -18,7 +18,8 @@ class TheMigration < ActiveRecord::Migration
 
       t.string :ws_server # for future use...
 
-      t.datetime :next_tick
+      t.datetime :next_open
+      t.datetime :next_round
 
       t.integer :round, :default => 1
       t.integer :max_round, :default => 3
