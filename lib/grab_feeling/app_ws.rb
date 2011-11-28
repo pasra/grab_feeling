@@ -28,6 +28,10 @@ module GrabFeeling
       @@websocket = block
     end
 
+    hook_event :hi do |msg|
+      I18n.reload!
+    end
+
     hook_event :join do |msg|
       @@pool.broadcast msg["room_id"], {type: :join, player_id: msg["player_id"],
                                    player_name: msg["player_name"]}
@@ -112,13 +116,21 @@ module GrabFeeling
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
               if room.in_game && (theme = (round = room.rounds.last).theme).text == json["message"]
                 point = (round.ends_at - Time.now).to_i
-                room.add_system_log :correct, name: i[:name], answer: theme.text, point: point
                 @@pool.broadcast i[:room_id], type: :correct, player_id: i[:player_id], point: point, answer: theme.text
                 round.next_at = Time.now+Config["operation"]["interval"]
                 round.save!
                 player = Player.find_by_id(i[:player_id])
                 player.point += point
                 player.save!
+                room.add_system_log :correct, name: i[:name], point: point
+
+                # TODO: DRY with scheduler.rb
+                room.add_system_log :round_end,
+                                    next_game: round.next_at - Time.now,
+                                    next_drawer: (round.drawer.next_player || room.players.first).name,
+                                    answer: round.theme.text
+
+
                 # TODO: notify point
                 # TODO: todo for answerer
                 # TODO: ignore drawer

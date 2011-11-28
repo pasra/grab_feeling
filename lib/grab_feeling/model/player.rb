@@ -6,6 +6,6 @@ class Player < ActiveRecord::Base
   has_many :logs, :dependent => :nullify
 
   def next_player
-    self.room.players.where('id >= ?', self.id).first
+    self.room.players.where('id > ?', self.id).first
   end
 end

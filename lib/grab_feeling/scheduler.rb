@@ -49,18 +49,7 @@ module GrabFeeling
             @rooms[id][1] = false
 
             # Round - next
-            if (round = room.next_round(@pool))
-              socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |k,pl|
-                pl[:player_id] == round.drawer.id
-              end
-
-              @pool.broadcast_to socket_wo_drawer, type: :topic, topic: round.topic
-              @pool.broadcast room.id, type: :round,
-                                       started_at: round.started_at,
-                                       next_at: round.next_at,
-                                       drawer: round.drawer.id
-              room.add_system_log :round_start, drawer: round.drawer.name
-            else
+            unless (round = room.next_round(@pool))
               # Game end
               @rooms.delete(id)
               @pool.broadcast room.id, type: :game_end
@@ -72,9 +61,10 @@ module GrabFeeling
             if round.ends_at != round.next_at
               room.add_system_log :round_end,
                                   next_game: Time.now - round.next_at,
-                                  next_drawer: round.drawer.next_player.name,
+                                  next_drawer: (round.drawer.next_player || room.players.first).name,
                                   answer: round.theme.text
             else
+              p :last_round_end
               room.add_system_log :last_round_end, answer: round.theme.text
             end
           else
