@@ -20,6 +20,14 @@ module GrabFeeling
       @pool_player[player_id]
     end
 
+    def broadcast(room_id, msg={})
+      broadcast_ find_by_room_id(room_id), msg
+    end
+
+    def broadcast_to_all(msg={})
+      broadcast_ @pool_player.values, msg
+    end
+
     def add(room_id, player_id, socket)
       player = Player.find_by_id(player_id)
       obj = {socket: socket, room_id: room_id, player_id: player_id, loaded: false}
@@ -40,6 +48,15 @@ module GrabFeeling
     end
 
     private
+
+    def broadcast_(ary, msg={})
+      message = msg.to_json
+      @@logger.info("broadcasting to #{room_id}: #{msg}")
+      ary.each do |pid,player|
+        @@logger.info("broadcasting to #{pid} @ #{room_id}")
+        player[:socket].send message
+      end
+    end
 
     def remove_(obj)
       return nil unless obj

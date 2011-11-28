@@ -23,27 +23,18 @@ module GrabFeeling
       @@websocket = block
     end
 
-    def self.ws_broadcast(room_id, msg={})
-      message = msg.to_json
-      @@logger.info("broadcasting to #{room_id}: #{msg}")
-      @@pool.find_by_room_id(room_id).each do |pid,player|
-        @@logger.info("broadcasting to #{pid} @ #{room_id}")
-        player[:socket].send message
-      end
-    end
-
     hook_event :join do |msg|
-      ws_broadcast msg["room_id"], {type: :join, player_id: msg["player_id"],
+      @@pool.broadcast msg["room_id"], {type: :join, player_id: msg["player_id"],
                                    player_name: msg["player_name"]}
     end
 
     hook_event :leave do |msg|
-      ws_broadcast msg["room_id"], {type: :leave, player_id: msg["player_id"],
+      @@pool.broadcast msg["room_id"], {type: :leave, player_id: msg["player_id"],
                                    player_name: msg["player_name"]}
     end
 
     hook_event :system_log do |msg|
-      ws_broadcast msg["room_id"], msg
+      @@pool.broadcast msg["room_id"], msg
     end
 
     websocket do |ws|
@@ -112,7 +103,7 @@ module GrabFeeling
               room = Room.find_by_id(i[:room_id])
 
               @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
-              ws_broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
+              @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
             when "draw"
               room = Room.find_by_id(i[:room_id])
@@ -122,7 +113,7 @@ module GrabFeeling
               else
                 json["player_id"] = i[:player_id]
                 @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
-                ws_broadcast i[:room_id], json
+                @@pool.broadcast i[:room_id], json
               end
             when "clear"
               room = Room.find_by_id(i[:room_id])
@@ -133,7 +124,7 @@ module GrabFeeling
                 @@image_requests[i[:room_id]][:clear] = true
               end
               room.add_system_log :cleared, name: i[:name]
-              ws_broadcast i[:room_id], json
+              @@pool.broadcast i[:room_id], json
             when "start"
             when "kick"
             when "skip"
