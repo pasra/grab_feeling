@@ -28,6 +28,10 @@ module GrabFeeling
       broadcast_ @pool_player.values, msg
     end
 
+    def broadcast_to(sockets,msg={})
+      broadcast_ sockets, msg
+    end
+
     def add(room_id, player_id, socket)
       player = Player.find_by_id(player_id)
       obj = {socket: socket, room_id: room_id, player_id: player_id, loaded: false}

@@ -147,7 +147,7 @@ module GrabFeeling
               logs: @room.logs(true).map{|l| {message: l.text, name: l.name, player_id: (l.player && l.player.id)} },
               players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point, you: pl.id == @player.id} },
               token: @player.token, debug: development?, websocket: Config["url"]["ws"],
-              player_id: @player.id}
+              player_id: @player.id, is_admin: @player.admin}
 
       json.to_json
     end

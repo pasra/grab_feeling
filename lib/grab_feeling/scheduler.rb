@@ -13,9 +13,12 @@ module GrabFeeling
       Room.where(:in_game => true).each do |room|
         @rooms[room.id] = room
       end
+      self
     end
 
     def add_game(room)
+      return nil if @rooms[room.id]
+
       ActiveRecord::Base.connection_pool.with_connection do
         ActiveRecord::Base.transaction do
           room.in_game = true
@@ -24,22 +27,30 @@ module GrabFeeling
         end
       end
 
-      @rooms[room.id] = room
+      @rooms[room.id] = [room, false]
+    end
+
+    def next(room_id)
+      @rooms[room_id][1] = true
     end
 
     def tick
       ActiveRecord::Base.connection_pool.with_connection do
-        @rooms.each do |id,room|
+        @rooms.each do |id,(room, flag)|
           round = room.rounds.last || room.next_round(true)
 
-          if round.next_at < Time.now
+          if flag || round.next_at < Time.now
+            @rooms[id][1] = false
+
             # Round - next
             if (round = room.next_round)
-              @pool.broadcast room.id, type: :topic, topic: round.topic.text
+              @pool.broadcast room.id, type: :topic, topic: round.topic
+              @pool.find_by_player_id(round.drawer.id).send({type: :topic, topic: round.theme.text}.to_json)
               @pool.broadcast room.id, type: :round,
                                        started_at: round.started_at,
                                        next_at: round.next_at,
                                        drawer: round.drawer.id
+              room.add_system_log :round_start, drawer: round.drawer.name
             else
               # Game end
               @rooms.delete(id)
@@ -53,6 +64,9 @@ module GrabFeeling
               room.add_system_log :round_end,
                                   next_game: Time.now - round.next_at,
                                   next_drawer: round.drawer.next_drawer.name
+                                  answer: round.theme.text
+            else
+              room.add_system_log :last_round_end, answer: round.theme.text
             end
           else
             # next open
@@ -77,7 +91,10 @@ module GrabFeeling
               round.opened = time
               round.save!
             end
-            @pool.broadcast room.id, type: :topic, topic: opened
+            socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |pl|
+              pl[:player_id] == round.drawer.id
+            end
+            @pool.broadcast_to socket_wo_drawer, type: :topic, topic: opened
           end
         end
       end

@@ -13,6 +13,7 @@
     %link{rel: "stylesheet", type: "text/css", href: "/css/grab_feeling.css"}
   %body
     %canvas#the_canvas{width: 750, height: 550}
+    %div#topic
     %div#player_list
       %p
     %div#logs
@@ -40,6 +41,7 @@
         %input#clear_button{type: 'button', value: t('ui.clear')}
       %p
         %input#snapshot{type: 'button', value: t('ui.snapshot')}
+        %input#start_button{type: 'button', value: t('ui.start'), style: 'display: none'}
     %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
       %input{type: "submit", name: "leave", value: t(:leave)}
 

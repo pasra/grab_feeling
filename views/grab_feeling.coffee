@@ -74,6 +74,15 @@ connect_websocket = ->
         add_system_log t('ui.loading')
       when "clear"
         canvas.clear()
+      when "topic"
+        $("#topic").text(msg.topic)
+      when "round"
+        if drawer != room.player_id
+          canvas.drawing_allowed = false
+      when "round_end"
+        canvas.drawing_allowed = true
+      when "game_end"
+        canvas.drawing_allowed = true
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"
@@ -142,6 +151,9 @@ $(document).ready ->
 
   $("#snapshot").click ->
     window.open(canvas.toDataURL("image/png"))
+
+  $("#start_button").click -> if ws && room.is_admin
+    ws.puts type: "start"
 
   $.getJSON("#{location.pathname}.json", (data) ->
     if data.error

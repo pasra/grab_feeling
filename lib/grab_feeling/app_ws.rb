@@ -4,8 +4,10 @@ require 'sinatra/reloader'
 require 'eventmachine'
 require 'em-websocket'
 require 'digest/sha1'
+require 'logger'
 require 'json'
-require_relative './socket_pool.rb'
+require_relative './socket_pool'
+require_relative './scheduler'
 
 module GrabFeeling
   class SocketApp < Sinatra::Base
@@ -14,6 +16,7 @@ module GrabFeeling
     @@logger = Logger.new(STDOUT)
     @@websocket = ->{}
     @@image_requests = {}
+    @@scheduler = Scheduler.new(@@pool).resume
 
     def self.hook_event(name,&block)
       (@@event_hooks[name] ||= []) << block
@@ -105,6 +108,14 @@ module GrabFeeling
               @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
               @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
+              if room.in_game && (theme = (round = room.rounds.last).theme).text == json["message"]
+                point = (round.ends_at - Time.now).to_i
+                room.add_system_log :correct, name: i[:name], answer: theme.text, point: point
+                @@pool.broadcast i[:room_id], type: :correct, player_id: i[:player_id], point: point, answer: theme.text
+                player = Player.find_by_id(i[:player_id])
+                player.point += point
+                player.save!
+              end
             when "draw"
               room = Room.find_by_id(i[:room_id])
 
@@ -126,6 +137,11 @@ module GrabFeeling
               room.add_system_log :cleared, name: i[:name]
               @@pool.broadcast i[:room_id], json
             when "start"
+              if Player.find_by_id(i[:player_id]).admin
+                @@scheduler.add_game Room.find_by_id(i[:room_id])
+              else
+                ws.send type: "forbidden"
+              end
             when "kick"
             when "skip"
             when "deop"

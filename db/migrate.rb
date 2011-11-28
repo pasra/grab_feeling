@@ -73,7 +73,7 @@ class TheMigration < ActiveRecord::Migration
       t.boolean :official, :default => false
     end
 
-    create_table :rooms_dictionaries, :id => false, :force => true do |t|
+    create_table :dictionaries_rooms, :id => false, :force => true do |t|
       t.integer :room_id
       t.integer :dictionary_id
     end
