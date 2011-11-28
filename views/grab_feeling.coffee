@@ -7,7 +7,9 @@ add_system_log = (str) ->
   $("#system_log")[0].scrollTop = $("#system_log")[0].scrollHeight
 
 add_chat_log = (name, message) ->
-  $("#chat_log").append($("<p>").text("#{name}: #{message}"))
+  p = $("#chat_log").append($("<p>"))
+  p.text("#{name}: #{message}")
+  p.html(p.text().replace(/((https?|ftp)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+))/, "<a href=\"$1\" target=\"_blank\">$1</a>"))
   $("#chat_log")[0].scrollTop = $("#chat_log")[0].scrollHeight
 
 room = undefined
