@@ -21,6 +21,11 @@
   padding: 0px;
 }
 
+.color_button {
+  width: 30px;
+  border: 2px solid white;
+}
+
 #system_log {
   float: left;
 }
