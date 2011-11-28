@@ -132,7 +132,10 @@ $(document).ready ->
     false
 
   $("input.color_button").each (i,v) -> $(v).click ->
+    former_color_button = $("#color_#{drawing_option.color}")
+    former_color_button.css("border", "none")
     drawing_option.color = $(v).attr('id').replace('color_','')
+    $(v).css("border", "2px solid black")
 
   $(".width_button").each (i,v) -> $(v).click ->
     drawing_option.width = $(v).attr('id').replace('width_','')
