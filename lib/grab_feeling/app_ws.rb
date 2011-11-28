@@ -136,7 +136,7 @@ module GrabFeeling
               @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
               @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
-              if room.in_game && (theme = (round = room.rounds.last).theme).text == json["message"]
+              if room.in_game && (round = room.rounds.last).drawer_id != i[:player_id] && (theme = round.theme).text == json["message"]
                 point = (round.ends_at - Time.now).to_i
                 @@pool.broadcast i[:room_id], type: :correct, player_id: i[:player_id], point: point, answer: theme.text
                 round.next_at = Time.now+Config["operation"]["interval"]
@@ -155,8 +155,6 @@ module GrabFeeling
                                     next_game: round.next_at - Time.now,
                                     next_drawer: (round.drawer.next_player || room.players.first).name,
                                     answer: round.theme.text
-
-                # TODO: ignore drawer
               end
             when "draw"
               room = Room.find_by_id(i[:room_id])
