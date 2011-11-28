@@ -16,7 +16,9 @@ module GrabFeeling
     @@logger = Logger.new(STDOUT)
     @@websocket = ->{}
     @@image_requests = {}
-    @@scheduler = Scheduler.new(@@pool).resume
+    EM.next_tick {
+      @@scheduler ||= Scheduler.new(@@pool,development?).resume
+    }
 
     def self.hook_event(name,&block)
       (@@event_hooks[name] ||= []) << block

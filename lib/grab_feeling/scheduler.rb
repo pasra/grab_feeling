@@ -3,10 +3,14 @@ require 'eventmachine'
 
 module GrabFeeling
   class Scheduler
-    def initialize(pool)
+    def initialize(pool,development=false)
       @rooms = {}
       @pool = pool
-      @timer = EM::PeriodicTimer.new(1, &(self.method(:tick)))
+      @timer = EM::PeriodicTimer.new(1, &(development ? self.method(:tick) : ->{tick()}))
+    end
+
+    def cancel
+      @timer.cancel
     end
 
     def resume
