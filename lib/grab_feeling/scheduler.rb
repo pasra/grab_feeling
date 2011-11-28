@@ -19,6 +19,7 @@ module GrabFeeling
       ActiveRecord::Base.connection_pool.with_connection do
         ActiveRecord::Base.transaction do
           room.in_game = true
+          room.round = 1
           room.save!
         end
       end
@@ -31,21 +32,36 @@ module GrabFeeling
         @rooms.each do |id,room|
           round = room.rounds.last || room.next_round(true)
 
-          # Round - timeout
           if round.next_at < Time.now
-            round = room.next_round
-            @pool.broadcast room.id, type: :topic, topic: round.topic.text
-            @pool.broadcast room.id, type: :round,
-                                     started_at: round.started_at,
-                                     next_at: round.next_at,
-                                     drawer: round.drawer.id
-          end
+            # Round - next
+            if (round = room.next_round)
+              @pool.broadcast room.id, type: :topic, topic: round.topic.text
+              @pool.broadcast room.id, type: :round,
+                                       started_at: round.started_at,
+                                       next_at: round.next_at,
+                                       drawer: round.drawer.id
+            else
+              # Game end
+              @rooms.delete(id)
+              @pool.broadcast room.id, type: :game_end
+              room.add_system_log :game_end
+            end
+          elsif round.ends_at < Time.now
+            # Round - end
+            @pool.broadcast room.id, type: :round_end
+            unless round.ends_at == round.next_at
+              room.add_system_log :round_end,
+                                  next_game: Time.now - round.next_at,
+                                  next_drawer: round.drawer.next_drawer.name
+            end
+          else
+            # next open
+            elapsed = Time.now - round.started_at
+            time, percent = Config["theme_opening"]["timings"].find{ |(t, percent)|
+                              elapsed > t }
 
-          # next open
-          elapsed = Time.now - round.started_at
-          time, percent = Config["theme_opening"]["timings"].find{ |(t, percent)|
-                            elapsed > t }
-          if round.opened < time
+            next unless round.opened < time
+
             opened = round.topic
             theme_str = round.theme.text
             text_len = theme_str.size
@@ -60,8 +76,8 @@ module GrabFeeling
               round.topic = opened
               round.opened = time
               round.save!
-              @pool.broadcast room.id, type: :topic, topic: opened
             end
+            @pool.broadcast room.id, type: :topic, topic: opened
           end
         end
       end
