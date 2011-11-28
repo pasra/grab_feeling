@@ -5,3 +5,4 @@
 * pckle
 * limit log transferring [-5..-1]?
 * unique themes
+* no wait before game ending
