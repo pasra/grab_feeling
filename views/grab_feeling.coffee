@@ -134,6 +134,8 @@ $(document).ready ->
 
   add_system_log t('ui.retriving_data')
 
+  $("#start_button").hide()
+
   $("#chat_form").submit ->
     if ws
       ws.puts type: "chat", message: $("#chat_field").val()
@@ -165,6 +167,8 @@ $(document).ready ->
     if data.logs
       for log in data.logs
         add_chat_log log.name, log.message
+
+    $("#start_button").show() if data.is_admin
 
     debug = data.debug
     room = data
