@@ -16,6 +16,13 @@ context = undefined
 drawing_option = {width: 3, color: 'black'}
 ws = undefined
 
+add_player = (player_id, name, point) ->
+  $("#player_list").append $("<span>").attr('id',"player#{player_id}") \
+                                      .text(name+"(") \
+                                      .append($("<span>").appendClass('point') \
+                                                         .text(point)) \
+                                      .append(")")
+
 connect_websocket = ->
   add_system_log t('ui.connecting')
   ws = new WebSocket(room.websocket+"?player_id=#{room.player_id}&token=#{room.token}")
@@ -60,11 +67,9 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        $("#player_list p").append("<span id=#{msg.player_id}>#{msg.player_name}(#{msg.point}) </span>")
-        dbg msg
+        add_player msg.player_id, msg.player_name, msg.point
       when "leave"
-        $("##{msg.player_id}").remove()
-        dbg msg
+        $("#player#{msg.player_id}").remove()
       when "system_log"
         add_system_log msg[room.locale]
       when "draw"
@@ -177,10 +182,8 @@ $(document).ready ->
     room = data
     dbg data
 
-    player_list = $("#player_list p")
-    jQuery.each(room.players, (i, player) ->
-      player_list.append("<span id=#{player.id}>#{player.name}(#{player.point}) </span>")
-    )
+    if room.players
+      add_player(player.id, player.name, player.point) for player in room.players
 
     connect_websocket()
   ).error((xhr, text, e) -> add_system_log "oops? #{text} - #{e}")
