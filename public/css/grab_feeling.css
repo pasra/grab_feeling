@@ -26,6 +26,10 @@
   border: 2px solid white;
 }
 
+.selected_color {
+  border: 2px solid black;
+}
+
 #system_log {
   float: left;
 }

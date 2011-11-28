@@ -152,11 +152,18 @@ $(document).ready ->
       $("#chat_field").val("")
     false
 
-  $("input.color_button").each (i,v) -> $(v).click ->
-    former_color_button = $("#color_#{drawing_option.color}")
-    former_color_button.css("border", "none")
-    drawing_option.color = $(v).attr('id').replace('color_','')
-    $(v).css("border", "2px solid black")
+  colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "ff0000","00ff00","0000ff"]
+  for color in colors
+    color_button = $("<input>")
+    color_button.attr('type', 'button') \
+                .css('background-color', "##{color}") \
+                .addClass('color_button')
+    $("#colors").append color_button
+
+  $("input.color_button").click (e) ->
+    $(".color_selected").removeClass('color_selected')
+    drawing_option.color = $(e.target).attr('id').replace('color_','#')
+    $(v).addClass('color_selected')
 
   $(".width_button").each (i,v) -> $(v).click ->
     drawing_option.width = $(v).attr('id').replace('width_','')
