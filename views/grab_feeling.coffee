@@ -168,6 +168,9 @@ $(document).ready ->
       for log in data.logs
         add_chat_log log.name, log.message
 
+    if data.topic
+      $("#topic").text data.topic
+
     $("#start_button").show() if data.is_admin
 
     debug = data.debug

@@ -114,9 +114,14 @@ module GrabFeeling
                 point = (round.ends_at - Time.now).to_i
                 room.add_system_log :correct, name: i[:name], answer: theme.text, point: point
                 @@pool.broadcast i[:room_id], type: :correct, player_id: i[:player_id], point: point, answer: theme.text
+                round.next_at = Time.now+Config["operation"]["interval"]
+                round.save!
                 player = Player.find_by_id(i[:player_id])
                 player.point += point
                 player.save!
+                # TODO: notify point
+                # TODO: todo for answerer
+                # TODO: ignore drawer
               end
             when "draw"
               room = Room.find_by_id(i[:room_id])

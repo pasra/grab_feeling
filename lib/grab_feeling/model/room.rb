@@ -27,12 +27,12 @@ class Room < ActiveRecord::Base
     self
   end
 
-  def next_round(is_first=false)
+  def next_round(pool, is_first=false)
     ActiveRecord::Base.transaction do
       dic_rand = rand(self.dictionaries.count)+self.dictionaries.first.id
-      dictionary = self.dictionaries.where('id >= ?', dic_rand)
+      dictionary = self.dictionaries.where('id >= ?', dic_rand).first
 
-      theme = dictionary.where('id >= ?', rand(dictionary.count)).first
+      theme = dictionary.themes.where('id >= ?', rand(dictionary.themes.count)+dictionary.themes.first.id).first
 
       if is_first || !(last_round = self.rounds.last)
         drawer = self.players.first
@@ -51,15 +51,21 @@ class Room < ActiveRecord::Base
 
       time = Time.now
 
-      next_at = if !next_player.next_player && (self.round + 1) > self.max_round
-                  time+Config["operation"]["turn"]
+      next_at = if !drawer.next_player && (self.round + 1) > self.max_round
+                  time+GrabFeeling::Config["operation"]["turn"]
                 else
-                  time+Config["operation"]["turn"]+Config["operation"]["interval"]
+                  time+GrabFeeling::Config["operation"]["turn"]+GrabFeeling::Config["operation"]["interval"]
                 end
 
-      self.rounds.create! topic: Config["theme_opening"]["hider"] * theme.text.size,
-                          theme_id: theme.id, drawer_id: drawer.id,
-                          started_at: time, next_at: next_at
+      round = self.rounds.create!(topic: GrabFeeling::Config["theme_opening"]["hider"] * theme.text.size,
+                                  theme_id: theme.id, drawer_id: drawer.id,
+                                  started_at: time, next_at: next_at)
+
+      if _=pool.find_by_player_id(drawer.id)
+        _[:socket].send({type: :topic, topic: theme.text}.to_json)
+      end
+
+      round
     end
   end
 end

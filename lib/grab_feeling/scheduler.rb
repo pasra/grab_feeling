@@ -41,15 +41,20 @@ module GrabFeeling
     def tick
       ActiveRecord::Base.connection_pool.with_connection do
         @rooms.each do |id,(room, flag)|
-          round = room.rounds.last || room.next_round(true)
+          round = room.rounds.last || room.next_round(@pool,true)
+
+        p round.next_at
 
           if flag || round.next_at < Time.now
             @rooms[id][1] = false
 
             # Round - next
-            if (round = room.next_round)
-              @pool.broadcast room.id, type: :topic, topic: round.topic
-              @pool.find_by_player_id(round.drawer.id).send({type: :topic, topic: round.theme.text}.to_json)
+            if (round = room.next_round(@pool))
+              socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |k,pl|
+                pl[:player_id] == round.drawer.id
+              end
+
+              @pool.broadcast_to socket_wo_drawer, type: :topic, topic: round.topic
               @pool.broadcast room.id, type: :round,
                                        started_at: round.started_at,
                                        next_at: round.next_at,
@@ -64,10 +69,10 @@ module GrabFeeling
           elsif round.ends_at < Time.now
             # Round - end
             @pool.broadcast room.id, type: :round_end
-            unless round.ends_at == round.next_at
+            if round.ends_at != round.next_at
               room.add_system_log :round_end,
                                   next_game: Time.now - round.next_at,
-                                  next_drawer: round.drawer.next_drawer.name,
+                                  next_drawer: round.drawer.next_player.name,
                                   answer: round.theme.text
             else
               room.add_system_log :last_round_end, answer: round.theme.text
@@ -76,7 +81,7 @@ module GrabFeeling
             # next open
             elapsed = Time.now - round.started_at
             time, percent = Config["theme_opening"]["timings"].find{ |(t, percent)|
-                              elapsed > t }
+                              elapsed > t } || Config["theme_opening"]["timings"].first
 
             next unless round.opened < time
 
@@ -95,7 +100,7 @@ module GrabFeeling
               round.opened = time
               round.save!
             end
-            socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |pl|
+            socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |k,pl|
               pl[:player_id] == round.drawer.id
             end
             @pool.broadcast_to socket_wo_drawer, type: :topic, topic: opened
