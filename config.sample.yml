@@ -20,6 +20,8 @@ websocket:
   port: 4569
   bind: 127.0.0.1
 # socket: /tmp/the.sock
+  timeout: 20
+  ping_interval: 10
 
 operation:
   max_players: 10
