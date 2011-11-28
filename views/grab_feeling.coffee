@@ -152,16 +152,18 @@ $(document).ready ->
       $("#chat_field").val("")
     false
 
-  colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "ff0000","00ff00","0000ff"]
+  colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000"]
   for color in colors
     color_button = $("<input>")
     color_button.attr('type', 'button') \
                 .css('background-color', "##{color}") \
+                .attr('id', "color_#{color}") \
                 .addClass('color_button')
     $("#colors").append color_button
 
   $("input.color_button").click (e) ->
     $(".color_selected").removeClass('color_selected')
+    dbg e.target
     drawing_option.color = $(e.target).attr('id').replace('color_','#')
     $(v).addClass('color_selected')
 
