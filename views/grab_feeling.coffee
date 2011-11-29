@@ -161,7 +161,6 @@ setup_canvas = ->
   $(canvas).mousedown (e) ->
     canvas.drawing = true
     canvas.old_point = canvas.pointer(e)
-    dbg canvas.drawing_allowed
 
   $(canvas).mousemove (e) -> if ws && canvas.drawing && canvas.drawing_allowed
     point = canvas.pointer(e)
@@ -169,9 +168,22 @@ setup_canvas = ->
     canvas.draw canvas.old_point, point, drawing_option
     canvas.old_point = point
 
+  $(canvas).bind 'touchstart', (e) ->
+    e.preventDefault()
+    canvas.drawing = true
+    canvas.old_point = canvas.pointer(event.changedTouches[0])
+
+  $(canvas).bind 'touchmove', (e) -> if ws && canvas.drawing && canvas.drawing_allowed
+      point = canvas.pointer(event.changedTouches[0])
+      dbg point
+      ws.puts type: "draw", from: canvas.old_point, to: point, option: drawing_option
+      canvas.draw canvas.old_point, point, drawing_option
+      canvas.old_point = point
+
   drawed = -> canvas.drawing = false
   $(canvas).mouseup drawed
   $(canvas).mouseout drawed
+  $(canvas).bind 'touchend', drawed
 
 $(document).ready ->
   setup_canvas()
@@ -272,6 +284,10 @@ $(document).ready ->
       else
         $("#remaining_timer").text('--:--')
     setInterval(remaining_timer, 500)
+
+    pong_timer = ->
+      ws.puts type: "ping" if ws
+    setInterval pong_timer, 5000
 
     debug = room.debug
     dbg room
