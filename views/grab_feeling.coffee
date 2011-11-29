@@ -143,7 +143,7 @@ setup_canvas = ->
 
   canvas.fill_background = (color) ->
     context.fillStyle = color
-    context.fillRect(0,0,canvas.width,canvas.height)
+    context.fillRect(0 ,0, canvas.width, canvas.height)
 
   canvas.draw = (from, to, option) ->
     context.strokeStyle = option.color || 'red'
@@ -152,7 +152,6 @@ setup_canvas = ->
     context.moveTo(from.x, from.y)
     context.lineTo(to.x, to.y)
     context.stroke()
-    context.closePath()
 
   $(canvas).mousedown (e) ->
     canvas.drawing = true
