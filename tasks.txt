@@ -5,12 +5,14 @@
 
 # for server
   * room GC
-  * last available data should be saved in DB
-  * last admin is ping timeouted
   * reconnect
   * join limitation
   * password
+
+# offline
   * offline (if offline auto skip)
+  * last available data should be saved in DB
+  * last admin is ping timeouted
   * leaving during turn -> critical bug
 
 # optional feature
