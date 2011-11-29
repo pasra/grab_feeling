@@ -66,16 +66,7 @@ module GrabFeeling
             end
           elsif round.ends_at < Time.now
             # Round - end
-            @pool.broadcast room.id, type: :round_end
-            if round.ends_at != round.next_at
-              room.add_system_log :round_end,
-                                  next_game: Time.now - round.next_at,
-                                  next_drawer: (round.drawer.next_player || room.players.first).name,
-                                  answer: round.theme.text
-            else
-              p :last_round_end
-              room.add_system_log :last_round_end, answer: round.theme.text
-            end
+            round.end
           else
             # next open
             elapsed = Time.now - round.started_at

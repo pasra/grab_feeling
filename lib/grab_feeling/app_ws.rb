@@ -137,25 +137,7 @@ module GrabFeeling
               @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
               if room.in_game && !(round = room.rounds.last).done && round.drawer_id != i[:player_id] && (theme = round.theme).text == json["message"]
-                point = (round.ends_at - Time.now).to_i
-                @@pool.broadcast i[:room_id], type: :correct, player_id: i[:player_id], point: point, answer: theme.text
-                round.next_at = Time.now+Config["operation"]["interval"]
-                round.done = true
-                round.save!
-
-                [round.drawer, Player.find_by_id(i[:player_id])].each do |player|
-                  player.point += point
-                  player.save!
-                  @@pool.broadcast room.id, type: :point, player_id: player.id, point: player.point
-                end
-
-                room.add_system_log :correct, name: i[:name], point: point
-
-                # TODO: DRY with scheduler.rb
-                room.add_system_log :round_end,
-                                    next_game: round.next_at - Time.now,
-                                    next_drawer: (round.drawer.next_player || room.players.first).name,
-                                    answer: round.theme.text
+                round.end Player.find_by_id(i[:player_id])
               end
             when "draw"
               room = Room.find_by_id(i[:room_id])
