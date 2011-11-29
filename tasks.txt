@@ -6,7 +6,6 @@
 * unique themes
 
 リロードした時にトピックがはてな一色
-クリアもできなくする
 音つける
 
 * don't start scheduler in app.rb
