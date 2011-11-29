@@ -175,6 +175,7 @@ module GrabFeeling
       return halt(404) unless @room
 
       if session[@room.session_key]
+        @is_mobile = (/iPad/ =~ request.user_agent)
         @player = Player.find_by_id(session[@room.session_key])
         @transition = @@transitions[I18n.locale] || @@transitions[Config["default_language"].to_sym]
         Communicator.notify :hi

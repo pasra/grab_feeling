@@ -11,6 +11,8 @@
     %script{src: "/js/i18n.js"}
     %script{src: "/js/grab_feeling.js"}
     %link{rel: "stylesheet", type: "text/css", href: "/css/grab_feeling.css"}
+    - if @is_mobile
+      %link{rel: "stylesheet", type: "text/css", href: "/css/ipad_grab_feeling.css"}
   %body
     %div#container
       %div#left
