@@ -1,12 +1,9 @@
-* Show player lists
-* Create game scheduler (GM)
-* ping timeout
 * room GC
+* when :game_end came?
 * pckle
 * limit log transferring [-5..-1]?
 * topic is not saved? after reload it'll be ??????
 * unique themes
-* no wait before game ending
 
 リロードした時にトピックがはてな一色、書けないときでも書ける、
 クリアもできなくする
