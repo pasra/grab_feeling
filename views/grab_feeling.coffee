@@ -23,7 +23,7 @@ room = undefined
 remaining_to = undefined
 canvas = undefined
 context = undefined
-drawing_option = {width: 3, color: '#000000', prev_colors: ['#000000']}
+drawing_option = {width: 3, color: '#2b2b2b', prev_colors: ['#2b2b2b']}
 ws = undefined
 
 add_player = (player_id, name, point) ->
@@ -199,7 +199,7 @@ $(document).ready ->
     false
 
   #colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "c0c0c0", "ffffff"]
-  colors = ["e60033", "f0908d", "ee7800", "ffd900", "98d98e", "007b43", "00552e", "a0d8ef", "1e50a2", "65318e", "6f4b3e", "c0c0c0", "2b2b2b", "000000", "ffffff"]
+  colors = ["e60033", "f0908d", "ee7800", "ffd900", "98d98e", "007b43", "00552e", "a0d8ef", "1e50a2", "65318e", "6f4b3e", "c0c0c0", "2b2b2b", "ffffff"]
   for color in colors
     container = $("<div>").addClass('color_button_container')
     container.append $("<div>").css('background-color', "##{color}") \
@@ -207,7 +207,7 @@ $(document).ready ->
                                  .addClass('color_button')
     $("#colors").append container
 
-  $("#color_000000").parent().addClass('color_selected')
+  $("#color_2b2b2b").parent().addClass('color_selected')
 
   color_select = (e) ->
     $(".color_selected").removeClass('color_selected')
