@@ -1,17 +1,19 @@
 * room GC
 * when :game_end came?
 * pckle
-* limit log transferring [-5..-1]?
-* topic is not saved? after reload it'll be ??????
-* unique themes
-
 * sounds
 
+# for admin
 * end game
 * skip turn
 * +o, -o
 * kick
+* unique themes (specified by user with option)
+* max_rounds should be specified by player(admin)
 
+
+
+* last available data should be saved in DB
 * last admin is ping timeouted
 * remaining time
 
