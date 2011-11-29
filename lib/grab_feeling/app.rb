@@ -123,7 +123,7 @@ module GrabFeeling
           end
         end
 
-        @room.dictionaries << Dictionary.first
+        Dictionary.all.each {|dic| @room.dictionaries << dic }
         @room.save!
 
         raise "!?" unless create_player(@room, params[:player][:name])
