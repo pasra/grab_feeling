@@ -127,6 +127,7 @@ connect_websocket = ->
 
 setup_canvas = ->
   canvas = $("#the_canvas")[0]
+  r = canvas.getBoundingClientRect()
   context = canvas.getContext("2d")
   context.lineCap = "round"
 
@@ -135,7 +136,6 @@ setup_canvas = ->
   show_hide_drawing_tool()
 
   canvas.pointer = (e) ->
-    r = this.getBoundingClientRect()
     {x: e.clientX - r.left, y: e.clientY - r.top}
 
   canvas.clear = ->
