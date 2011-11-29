@@ -5,7 +5,7 @@
 * topic is not saved? after reload it'll be ??????
 * unique themes
 
-リロードした時にトピックがはてな一色、書けないときでも書ける、
+リロードした時にトピックがはてな一色
 クリアもできなくする
 音つける
 

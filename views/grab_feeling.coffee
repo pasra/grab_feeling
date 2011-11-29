@@ -41,7 +41,7 @@ connect_websocket = ->
           draw buf.from, buf.to, buf.option for buf in msg.buffer
           add_system_log t('ui.loaded')
           ws.puts type: "image_loaded"
-          canvas.drawing_allowed = true
+          canvas.drawing_allowed = (room.player_id == room.drawer_id)
 
         if msg.clear
           draw_buffer()
@@ -57,7 +57,7 @@ connect_websocket = ->
       when "empty_image"
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
-        canvas.drawing_allowed = true
+        canvas.drawing_allowed = (room.player_id == room.drawer_id)
       when "image_request"
         dbg "Returning image"
         ws.puts type: "image", image: canvas.toDataURL("image/png")
@@ -84,7 +84,9 @@ connect_websocket = ->
       when "topic"
         $("#topic").text(msg.topic)
       when "round"
-        if drawer != room.player_id
+        dbg "round"
+        dbg msg
+        if msg.drawer != room.player_id
           canvas.drawing_allowed = false
         canvas.clear()
       when "round_end"
@@ -128,6 +130,7 @@ setup_canvas = ->
   $(canvas).mousedown (e) ->
     canvas.drawing = true
     canvas.old_point = canvas.pointer(e)
+    dbg canvas.drawing_allowed
 
   $(canvas).mousemove (e) -> if ws && canvas.drawing && canvas.drawing_allowed
     point = canvas.pointer(e)
@@ -183,15 +186,20 @@ $(document).ready ->
     if data.error
       add_system_log "Error: #{data.error}"
       return
+
     if data.system_logs
       for log in data.system_logs
         add_system_log log[data.locale]
+
     if data.logs
       for log in data.logs
         add_chat_log log.name, log.message
 
     if data.topic
       $("#topic").text data.topic
+
+    if data.player_id != data.drawer_id
+      canvas.drawing_allowed = false
 
     $("#start_button").show() if data.is_admin
 
