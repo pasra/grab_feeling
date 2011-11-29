@@ -9,6 +9,9 @@
   * last admin is ping timeouted
   * reconnect
   * join limitation
+  * password
+  * offline (if offline auto skip)
+  * leaving during turn -> critical bug
 
 # optional feature
   * pckles
@@ -23,3 +26,6 @@
 # before starting game
   * unique themes (specified by user with option)
   * max_rounds should be specified by player(admin)
+
+# idea
+  * stats
