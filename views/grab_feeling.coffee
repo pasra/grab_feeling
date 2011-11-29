@@ -13,6 +13,12 @@ add_chat_log = (name, message) ->
   $("#chat_log").append p
   $("#chat_log")[0].scrollTop = $("#chat_log")[0].scrollHeight
 
+show_hide_drawing_tool = ->
+  if canvas.drawing_allowed
+    $(".drawing_tool").show()
+  else
+    $(".drawing_tool").hide()
+
 room = undefined
 canvas = undefined
 context = undefined
@@ -42,6 +48,7 @@ connect_websocket = ->
           add_system_log t('ui.loaded')
           ws.puts type: "image_loaded"
           canvas.drawing_allowed = (room.player_id == room.drawer_id)
+          show_hide_drawing_tool()
 
         if msg.clear
           draw_buffer()
@@ -58,6 +65,7 @@ connect_websocket = ->
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
         canvas.drawing_allowed = (room.player_id == room.drawer_id)
+        show_hide_drawing_tool()
       when "image_request"
         dbg "Returning image"
         ws.puts type: "image", image: canvas.toDataURL("image/png")
@@ -88,11 +96,14 @@ connect_websocket = ->
         dbg msg
         if msg.drawer != room.player_id
           canvas.drawing_allowed = false
+          show_hide_drawing_tool()
         canvas.clear()
       when "round_end"
         canvas.drawing_allowed = true
+        show_hide_drawing_tool()
       when "game_end"
         canvas.drawing_allowed = true
+        show_hide_drawing_tool()
       when "point"
         $("#player#{msg.player_id} .point").text(msg.point)
 #      when "needs_token"
@@ -110,6 +121,7 @@ setup_canvas = ->
 
   canvas.drawing = false
   canvas.drawing_allowed = false
+  show_hide_drawing_tool()
 
   canvas.pointer = (e) ->
     r = this.getBoundingClientRect()
@@ -200,6 +212,7 @@ $(document).ready ->
 
     if data.player_id != data.drawer_id
       canvas.drawing_allowed = false
+      show_hide_drawing_tool()
 
     $("#start_button").show() if data.is_admin
 

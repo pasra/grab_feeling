@@ -24,18 +24,18 @@
           %input{type: 'submit', value: t(:say), disabled: true}
     %div#clear
     %div#buttons
-      %div#colors
-      %p
+      %div.drawing_tool#colors
+      %p.drawing_tool
         %input.width_button#width_1{type: 'button', value: t('ui.width.one')}
         %input.width_button#width_2{type: 'button', value: t('ui.width.two')}
         %input.width_button#width_3{type: 'button', value: t('ui.width.three')}
         %input.width_button#width_5{type: 'button', value: t('ui.width.five')}
         %input.width_button#width_10{type: 'button', value: t('ui.width.ten')}
       %p
-        %input#clear_button{type: 'button', value: t('ui.clear')}
+        %input.drawing_tool#clear_button{type: 'button', value: t('ui.clear')}
       %p
         %input#snapshot{type: 'button', value: t('ui.snapshot')}
-        %input#start_button{type: 'button', value: t('ui.start')}
+        %input.admin_tool#start_button{type: 'button', value: t('ui.start')}
     %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
       %input{type: "submit", name: "leave", value: t(:leave)}
 
