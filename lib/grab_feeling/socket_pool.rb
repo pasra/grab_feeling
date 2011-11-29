@@ -63,8 +63,8 @@ module GrabFeeling
     def remove_(obj)
       return nil unless obj
       @sockets.delete(obj[:socket].__id__)
-      @pool[obj[:room_id]].delete(obj[:player_id])
-      @pool_player.delete(obj[:player_id])
+      @pool[obj[:room_id]].delete(obj[:player_id]) unless obj[:replace]
+      @pool_player.delete(obj[:player_id]) unless obj[:replace]
       self
     end
   end

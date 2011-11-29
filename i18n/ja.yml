@@ -19,6 +19,7 @@ ja:
   leave: 退室
   ui:
     retriving_data: ルーム情報を取得しています
+    another_connected: 同じルームは同時に1ウィンドウまでしか開くことができません．新しいウィンドウを優先しこのウィンドウはゲームサーバーから切断されます
     connecting: ゲームサーバーに接続しています...
     connected: 接続しました
     loading: キャンバスを読み込んでいます...

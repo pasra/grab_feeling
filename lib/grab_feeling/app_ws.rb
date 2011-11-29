@@ -65,7 +65,15 @@ module GrabFeeling
 
         if (player = Player.find_by_id(ws.request["query"]["player_id"])) && player.token == ws.request["query"]["token"]
           @@logger.info("#{ws.__id__}: Authorize succeeded")
+
+          _ = @@pool.find_by_player_id(player.id)
           @@pool.add(player.room_id, player.id, ws)
+          if _
+            _[:replace] = true
+            _[:socket].send({type: "another_connected"}.to_json)
+            _[:socket].close_websocket
+          end
+
           ws.send({type: "authorize_succeeded"}.to_json)
         else
           @@logger.info("#{ws.__id__}: Authorize failed")
@@ -74,7 +82,8 @@ module GrabFeeling
         end
 
         ping_timer = EM.add_periodic_timer(@@ping_interval) do
-          ws.instance_eval { @handler.send_frame(:ping, "PING") rescue nil}
+          ws.instance_eval { begin; @handler.send_frame(:ping, "PING")
+                             rescue Exception; end}
         end
 
         timeout_check = EM.add_periodic_timer(@@timeout) do
@@ -180,17 +189,17 @@ module GrabFeeling
       end
 
       ws.onclose do
-        @@pool.remove(ws)
+        @@pool.remove(ws)#if (_ = @@pool.find(ws)) && !_[:replace]
         ping_timer.cancel
         timeout_check.cancel
         @@logger.info("#{ws.__id__}: closed")
       end
 
       ws.onerror do |e|
-        @@pool.remove(ws)
-        ping_timer.cancel
-        timeout_check.cancel
-        @@logger.error("#{ws.__id__}: closed (by error: #{e.message})")
+        @@pool.remove(ws)#if (_ = @@pool.find(ws)) && !_[:replace]
+        ping_timer.cancel if ping_timer
+        timeout_check.cancel if timeout_check
+        @@logger.error("#{ws.__id__}: closed (by error: #{e.message}}\n#{e.backtrace.join("\n")}")
       end
     end
 
