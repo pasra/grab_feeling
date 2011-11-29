@@ -13,6 +13,5 @@
 
 * last available data should be saved in DB
 * last admin is ping timeouted
-* remaining time
 
 * reconnect
