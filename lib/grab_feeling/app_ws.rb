@@ -74,7 +74,7 @@ module GrabFeeling
         end
 
         ping_timer = EM.add_periodic_timer(@@ping_interval) do
-          ws.instance_eval { @handler.send_frame(:ping, "PING") }
+          ws.instance_eval { @handler.send_frame(:ping, "PING") rescue nil}
         end
 
         timeout_check = EM.add_periodic_timer(@@timeout) do
