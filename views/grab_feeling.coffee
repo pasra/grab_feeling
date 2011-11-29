@@ -142,7 +142,6 @@ setup_canvas = ->
     context.clearRect(0, 0, canvas.width, canvas.height)
 
   canvas.fill_background = (color) ->
-    context = canvas.getContext('2d')
     context.strokeStyle = color
     context.fillStyle = color
     context.beginPath()
