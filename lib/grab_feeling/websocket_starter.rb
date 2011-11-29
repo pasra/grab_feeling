@@ -15,6 +15,7 @@ module GrabFeeling
                   port: Config["websocket"]["port"] || 4566}
                end
       EM.defer { EM::WebSocket.start(ws_opt, &(development? ? ->(ws){@@websocket[ws]} : @@websocket)) }
+      @@scheduler ||= Scheduler.new(@@pool,development?).resume
     end
   end
 end

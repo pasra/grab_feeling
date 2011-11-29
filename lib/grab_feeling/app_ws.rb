@@ -16,9 +16,6 @@ module GrabFeeling
     @@logger = Logger.new(STDOUT)
     @@websocket = ->{}
     @@image_requests = {}
-    EM.next_tick {
-      @@scheduler ||= Scheduler.new(@@pool,development?).resume
-    }
     @@timeout = Config["websocket"]["timeout"]
     @@ping_interval = Config["websocket"]["ping_interval"]
 

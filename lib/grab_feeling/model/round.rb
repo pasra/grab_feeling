@@ -13,7 +13,7 @@ class Round < ActiveRecord::Base
   def end(pool, answerer = nil)
     point = (self.ends_at - Time.now).to_i
 
-    pool.broadcast self.room_id, type: :correct, player_id: i[:player_id],
+    pool.broadcast self.room_id,  type: :correct, player_id: answerer.id,
                                   point: point, answer: theme.text
     pool.broadcast self.room_id, type: :round_end
 
@@ -26,7 +26,7 @@ class Round < ActiveRecord::Base
         player.save!
         pool.broadcast self.room_id, type: :point, player_id: player.id, point: player.point
       end
-      room.add_system_log :correct, name: i[:name], point: point
+      room.add_system_log :correct, name: answerer.name, point: point
     end
 
     self.topic = self.theme.text
