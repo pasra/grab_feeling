@@ -198,7 +198,7 @@ $(document).ready ->
       $("#chat_field").val("")
     false
 
-  colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "ffffff"]
+  colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "c0c0c0", "ffffff"]
   for color in colors
     container = $("<div>").addClass('color_button_container')
     container.append $("<div>").css('background-color', "##{color}") \
