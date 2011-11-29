@@ -56,6 +56,7 @@ class TheMigration < ActiveRecord::Migration
 
       t.boolean :admin, :default => false
       t.boolean :viewer, :default => false
+      t.boolean :online, :default => false
 
       t.datetime :last_available
 
