@@ -11,12 +11,8 @@
 * unique themes (specified by user with option)
 * max_rounds should be specified by player(admin)
 
-
-
 * last available data should be saved in DB
 * last admin is ping timeouted
 * remaining time
 
 * reconnect
-
-* joiner point ()

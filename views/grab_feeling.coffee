@@ -77,7 +77,7 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        add_player msg.player_id, msg.player_name, msg.point
+        add_player msg.player_id, msg.player_name, msg.player_point
       when "leave"
         $("#player#{msg.player_id}").remove()
       when "system_log"

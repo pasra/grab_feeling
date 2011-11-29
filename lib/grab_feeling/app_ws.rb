@@ -32,13 +32,14 @@ module GrabFeeling
     end
 
     hook_event :join do |msg|
-      @@pool.broadcast msg["room_id"], {type: :join, player_id: msg["player_id"],
-                                   player_name: msg["player_name"]}
+      @@pool.broadcast msg["room_id"], type: :join, player_id: msg["player_id"],
+                                       player_name: msg["player_name"],
+                                       player_point: msg["player_point"]
     end
 
     hook_event :leave do |msg|
-      @@pool.broadcast msg["room_id"], {type: :leave, player_id: msg["player_id"],
-                                   player_name: msg["player_name"]}
+      @@pool.broadcast msg["room_id"], type: :leave, player_id: msg["player_id"],
+                                       player_name: msg["player_name"]
     end
 
     hook_event :system_log do |msg|
