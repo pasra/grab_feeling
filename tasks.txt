@@ -7,5 +7,3 @@
 
 リロードした時にトピックがはてな一色
 音つける
-
-* don't start scheduler in app.rb
