@@ -76,7 +76,9 @@ module GrabFeeling
             next unless time
             next unless round.opened < time
 
-            opened = round.topic
+            #round.reload
+
+            opened = round.topic.dup
             theme_str = round.theme.text
             text_len = theme_str.size
 
@@ -84,13 +86,13 @@ module GrabFeeling
                   c == Config["theme_opening"]["hider"] ? i : nil }
 
             open_size = (percent * text_len).round - _.select(&:nil?).size
+            next if open_size < 0
             _.reject(&:nil?).sample(open_size).each {|i| opened[i] = theme_str[i] }
 
             ActiveRecord::Base.transaction do
-              round.topic = opened
-              round.opened = time
-              round.save!
+              round.update_attributes!(topic: opened, opened: time)
             end
+
             socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |k,pl|
               pl[:player_id] == round.drawer.id
             end

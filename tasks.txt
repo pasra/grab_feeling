@@ -5,5 +5,16 @@
 * topic is not saved? after reload it'll be ??????
 * unique themes
 
-リロードした時にトピックがはてな一色
-音つける
+* sounds
+
+* end game
+* skip turn
+* +o, -o
+* kick
+
+* last admin is ping timeouted
+* remaining time
+
+* reconnect
+
+* joiner point ()

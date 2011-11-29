@@ -23,6 +23,7 @@ ja:
     connected: 接続しました
     loading: キャンバスを読み込んでいます...
     loaded: 読み込みました
+    start: ゲーム開始
     color:
       white: 白
       black: 黒

@@ -139,6 +139,7 @@ module GrabFeeling
       @room = Room.find_by_unique_id(params[:id])
       return halt(404) unless @room
       return {error: "Who are you?"}.to_json unless session[@room.session_key]
+      #@room.reload
 
       @player = @room.players.find_by_id(session[@room.session_key])
       return {error: "Who are you? wrong id?"}.to_json unless @player
