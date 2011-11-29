@@ -137,7 +137,7 @@ module GrabFeeling
               @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
               room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
               if room.in_game && !(round = room.rounds.last).done && round.drawer_id != i[:player_id] && (theme = round.theme).text == json["message"]
-                round.end Player.find_by_id(i[:player_id])
+                round.end @@pool, Player.find_by_id(i[:player_id])
               end
             when "draw"
               room = Room.find_by_id(i[:room_id])

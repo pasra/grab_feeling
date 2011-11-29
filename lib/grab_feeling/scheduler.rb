@@ -66,7 +66,7 @@ module GrabFeeling
             end
           elsif round.ends_at < Time.now
             # Round - end
-            round.end
+            round.end @pool
           else
             # next open
             elapsed = Time.now - round.started_at

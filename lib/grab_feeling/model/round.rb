@@ -10,12 +10,12 @@ class Round < ActiveRecord::Base
     self.started_at + GrabFeeling::Config["operation"]["turn"]
   end
 
-  def end(answerer = nil)
+  def end(pool, answerer = nil)
     point = (self.ends_at - Time.now).to_i
 
-    @@pool.broadcast self.room_id, type: :correct, player_id: i[:player_id],
+    pool.broadcast self.room_id, type: :correct, player_id: i[:player_id],
                                   point: point, answer: theme.text
-    @pool.broadcast self.room_id, type: :round_end
+    pool.broadcast self.room_id, type: :round_end
 
     is_last = (round.ends_at == round.next_at)
 
@@ -24,13 +24,16 @@ class Round < ActiveRecord::Base
       [self.drawer, answerer].each do |player|
         player.point += point
         player.save!
-        @@pool.broadcast self.room_id, type: :point, player_id: player.id, point: player.point
+        pool.broadcast self.room_id, type: :point, player_id: player.id, point: player.point
       end
       room.add_system_log :correct, name: i[:name], point: point
     end
 
+    self.topic = self.theme.text
     self.done = true
     self.save!
+
+    pool.broadcast self.room_id, type: :topic, topic: self.topic
 
     if !is_last
       room.add_system_log :round_end,
@@ -38,7 +41,7 @@ class Round < ActiveRecord::Base
                           next_drawer: (self.drawer.next_player || room.players.first).name,
                           answer: self.theme.text
     else
-      room.add_system_log :last_round_end, answer: round.theme.text
+      room.add_system_log :last_round_end, answer: self.topic
     end
   end
 end
