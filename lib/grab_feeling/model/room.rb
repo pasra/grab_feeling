@@ -71,6 +71,7 @@ class Room < ActiveRecord::Base
       pool.broadcast self.id, type: :round,
                               started_at: round.started_at,
                               next_at: round.next_at,
+                              ends_at: round.ends_at,
                               drawer: round.drawer.id
 
       self.add_system_log :round_start, drawer: round.drawer.name

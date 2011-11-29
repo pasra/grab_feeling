@@ -20,6 +20,7 @@ show_hide_drawing_tool = ->
     $(".drawing_tool").hide()
 
 room = undefined
+remaining_to = undefined
 canvas = undefined
 context = undefined
 drawing_option = {width: 3, color: 'black'}
@@ -92,17 +93,19 @@ connect_websocket = ->
       when "topic"
         $("#topic").text(msg.topic)
       when "round"
-        dbg "round"
         dbg msg
         if msg.drawer != room.player_id
           canvas.drawing_allowed = false
           show_hide_drawing_tool()
+        remaining_to = Date.parse(msg.ends_at)
         canvas.clear()
       when "round_end"
         canvas.drawing_allowed = true
         show_hide_drawing_tool()
+        remaining_to = Date.parse(msg.next_at)
       when "game_end"
         canvas.drawing_allowed = true
+        remaining_to = undefined
         show_hide_drawing_tool()
       when "point"
         $("#player#{msg.player_id} .point").text(msg.point)
@@ -195,33 +198,56 @@ $(document).ready ->
     ws.puts type: "start"
 
   $.getJSON("#{location.pathname}.json", (data) ->
-    if data.error
-      add_system_log "Error: #{data.error}"
+    room = data
+
+    if room.error
+      add_system_log "Error: #{room.error}"
       return
 
-    if data.system_logs
-      for log in data.system_logs
-        add_system_log log[data.locale]
+    if room.system_logs
+      for log in room.system_logs
+        add_system_log log[room.locale]
 
-    if data.logs
-      for log in data.logs
+    if room.logs
+      for log in room.logs
         add_chat_log log.name, log.message
 
-    if data.topic
-      $("#topic").text data.topic
+    if room.topic
+      $("#topic").text room.topic
 
-    if data.player_id != data.drawer_id
+    if room.player_id != room.drawer_id
       canvas.drawing_allowed = false
       show_hide_drawing_tool()
 
-    $("#start_button").show() if data.is_admin
-
-    debug = data.debug
-    room = data
-    dbg data
-
     if room.players
       add_player(player.id, player.name, player.point) for player in room.players
+
+    if room.ends_at
+      remaining_to = Date.parse(room.ends_at)
+    if room.next_at
+      remaining_to = Date.parse(room.next_at)
+
+    $("#start_button").show() if room.is_admin
+
+    remaining_timer = ->
+      if remaining_to
+        now = new Date
+        to = new Date
+        to.setTime remaining_to
+        diff = Math.round((to-now) / 1000)
+        dbg diff
+        min = Math.floor(diff / 60).toString()
+        sec = Math.round(diff % 60).toString()
+        min = "0" + min if min.length == 1
+        sec = "0" + sec if sec.length == 1
+        remain = "#{min}:#{sec}"
+        $("#remaining_timer").text(remain)
+      else
+        $("#remaining_timer").text('--:--')
+    setInterval(remaining_timer, 500)
+
+    debug = room.debug
+    dbg room
 
     connect_websocket()
   ).error((xhr, text, e) -> add_system_log "oops? #{text} - #{e}")

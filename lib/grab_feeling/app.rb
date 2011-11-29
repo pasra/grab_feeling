@@ -153,6 +153,11 @@ module GrabFeeling
         if (round = @room.rounds.last)
           json[:topic] = round.drawer_id == @player.id ? round.theme.text : round.topic
           json[:drawer_id] = round.drawer_id
+          if round.done
+            json[:next_at] = round.next_at
+          else
+            json[:ends_at] = round.ends_at
+          end
         else
           json[:topic] = ""
           json[:drawer_id] = @player.id
