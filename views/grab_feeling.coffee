@@ -160,6 +160,8 @@ $(document).ready ->
                                  .addClass('color_button')
     $("#colors").append container
 
+  $("#color_000000").parent().addClass('color_button_container')
+
   $("div.color_button").click (e) ->
     $(".color_selected").removeClass('color_selected')
     drawing_option.color = $(e.target).attr('id').replace('color_','#')
