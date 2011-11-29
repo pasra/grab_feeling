@@ -142,11 +142,8 @@ setup_canvas = ->
     context.clearRect(0, 0, canvas.width, canvas.height)
 
   canvas.fill_background = (color) ->
-    context.strokeStyle = color
     context.fillStyle = color
-    context.beginPath()
     context.fillRect(0,0,canvas.width,canvas.height)
-    context.closePath()
 
   canvas.draw = (from, to, option) ->
     context.strokeStyle = option.color || 'red'
