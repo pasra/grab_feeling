@@ -144,6 +144,7 @@ module GrabFeeling
                 ws.send({type: "draw_not_allowed"}.to_json)
               else
                 json["player_id"] = i[:player_id]
+                @@image_requests[i[:room_id]][:buffer] = [] if json["fill"] && @@image_requests[i[:room_id]]
                 @@image_requests[i[:room_id]][:buffer] << json if @@image_requests[i[:room_id]]
                 @@pool.broadcast i[:room_id], json
               end

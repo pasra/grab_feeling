@@ -3,9 +3,8 @@
 }
 
 .log {
-  height: 100px;
   overflow: auto;
-  width: 375px;
+  width: 280px;
 }
 
 #system_log {
@@ -13,7 +12,7 @@
 }
 
 #chat_field {
-  width: 320px;
+  width: 240px;
 }
 
 .log p, #buttons p {
@@ -22,10 +21,10 @@
 }
 
 .color_button {
-  width: 30px;
+  width: 18px;
   border: 1px solid white;
   padding: 0; margin: 0;
-  height: 20px;
+  height: 30px;
 }
 
 #color_ffffff {
@@ -34,14 +33,12 @@
 }
 
 #colors {
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 
 .color_button_container {
   padding: 2px;
   background-color: white;
-  margin-right: 5px;
+  margin-right: 3px;
   float: left;
 }
 
@@ -50,7 +47,30 @@
 }
 
 #system_log {
+  height: 189px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid gray;
+}
+
+#chat_log {
+  padding-top: 5px;
+  height: 300px;
+}
+
+#left {
   float: left;
+  margin-right: 10px;
+}
+
+header #remaining_timer{
+  float: right;
+}
+header #topic {
+  float: left;
+}
+
+header *{
+  font-size: 2em;
 }
 
 #clear {

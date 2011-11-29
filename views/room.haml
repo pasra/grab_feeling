@@ -12,31 +12,37 @@
     %script{src: "/js/grab_feeling.js"}
     %link{rel: "stylesheet", type: "text/css", href: "/css/grab_feeling.css"}
   %body
-    %canvas#the_canvas{width: 750, height: 550}
-    %div#topic
-    %div#remaining_timer --:--
-    %div#player_list
-    %div#logs
-      %div.log#system_log
-      %div#chat
-        %div.log#chat_log
-        %form#chat_form{action: "#"}
-          %input#chat_field{type: 'text', size: '40'}
-          %input{type: 'submit', value: t(:say), disabled: true}
-    %div#clear
-    %div#buttons
-      %div.drawing_tool#colors
-      %p.drawing_tool
-        %input.width_button#width_1{type: 'button', value: t('ui.width.one')}
-        %input.width_button#width_2{type: 'button', value: t('ui.width.two')}
-        %input.width_button#width_3{type: 'button', value: t('ui.width.three')}
-        %input.width_button#width_5{type: 'button', value: t('ui.width.five')}
-        %input.width_button#width_10{type: 'button', value: t('ui.width.ten')}
-      %p
-        %input.drawing_tool#clear_button{type: 'button', value: t('ui.clear')}
-      %p
-        %input#snapshot{type: 'button', value: t('ui.snapshot')}
-        %input.admin_tool#start_button{type: 'button', value: t('ui.start')}
-    %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
-      %input{type: "submit", name: "leave", value: t(:leave)}
+    %div#container
+      %div#left
+        %header
+          %div#topic
+          %div#remaining_timer --:--
+        %div#clear
+        %canvas#the_canvas{width: 750, height: 550}
+        %div#drawing_tools
+          %div.drawing_tool#colors
+          %div.drawing_tool
+            %input.width_button#width_1{type: 'button', value: t('ui.width.one')}
+            %input.width_button#width_2{type: 'button', value: t('ui.width.two')}
+            %input.width_button#width_3{type: 'button', value: t('ui.width.three')}
+            %input.width_button#width_5{type: 'button', value: t('ui.width.five')}
+            %input.width_button#width_10{type: 'button', value: t('ui.width.ten')}
+          %div.drawing_tool
+            %input.drawing_tool#clear_button{type: 'button', value: t('ui.clear')}
+        %div#player_list
+        %div#clear
 
+      %div#right
+        %div#buttons
+          %p
+            %input#snapshot{type: 'button', value: t('ui.snapshot')}
+            %input.admin_tool#start_button{type: 'button', value: t('ui.start')}
+            %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
+              %input{type: "submit", name: "leave", value: t(:leave)}
+        %div#logs
+          %div.log#system_log
+          %div#chat
+            %div.log#chat_log
+            %form#chat_form{action: "#"}
+              %input#chat_field{type: 'text', size: '40'}
+              %input{type: 'submit', value: t(:say), disabled: true}

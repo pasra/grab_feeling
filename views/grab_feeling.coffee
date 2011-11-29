@@ -23,7 +23,7 @@ room = undefined
 remaining_to = undefined
 canvas = undefined
 context = undefined
-drawing_option = {width: 3, color: 'black'}
+drawing_option = {width: 3, color: '#000000', prev_colors: ['#000000']}
 ws = undefined
 
 add_player = (player_id, name, point) ->
@@ -45,7 +45,12 @@ connect_websocket = ->
     switch msg.type
       when "image"
         draw_buffer = ->
-          draw buf.from, buf.to, buf.option for buf in msg.buffer
+          for buf in msg.buffer
+            if buf.fill
+              canvas.fill_background buf.fill
+            else
+              canvas.draw buf.from, buf.to, buf.option
+
           add_system_log t('ui.loaded')
           ws.puts type: "image_loaded"
           canvas.drawing_allowed = (room.player_id == room.drawer_id)
@@ -85,7 +90,10 @@ connect_websocket = ->
         add_system_log msg[room.locale]
       when "draw"
         unless room.player_id == msg.player_id
-          canvas.draw msg.from, msg.to, msg.option
+          if msg.fill
+            canvas.fill_background msg.fill
+          else
+            canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
       when "clear"
@@ -133,6 +141,14 @@ setup_canvas = ->
   canvas.clear = ->
     context.clearRect(0, 0, canvas.width, canvas.height)
 
+  canvas.fill_background = (color) ->
+    context = canvas.getContext('2d')
+    context.strokeStyle = color
+    context.fillStyle = color
+    context.beginPath()
+    context.fillRect(0,0,canvas.width,canvas.height)
+    context.closePath()
+
   canvas.draw = (from, to, option) ->
     context.strokeStyle = option.color || 'red'
     context.lineWidth = option.width || 1
@@ -140,7 +156,7 @@ setup_canvas = ->
     context.moveTo(from.x, from.y)
     context.lineTo(to.x, to.y)
     context.stroke()
-    #context.closePath()
+    context.closePath()
 
   $(canvas).mousedown (e) ->
     canvas.drawing = true
@@ -178,12 +194,23 @@ $(document).ready ->
                                  .addClass('color_button')
     $("#colors").append container
 
-  $("#color_000000").parent().addClass('color_button_container')
+  $("#color_000000").parent().addClass('color_selected')
 
-  $("div.color_button").click (e) ->
+  color_select = (e) ->
     $(".color_selected").removeClass('color_selected')
+    drawing_option.prev_colors.unshift drawing_option.color
     drawing_option.color = $(e.target).attr('id').replace('color_','#')
     $(e.target).parent().addClass('color_selected')
+
+  $("div.color_button").click color_select
+
+  $("div.color_button").dblclick (e) ->
+    color = $(e.target).attr('id').replace('color_','#')
+    color_select target: $("#color_#{drawing_option.prev_colors[2].replace('#','')}")[0]
+    drawing_option.prev_colors = [drawing_option.color]
+    if canvas.drawing_allowed
+      canvas.fill_background color
+      ws.puts type: "draw", fill: color
 
   $(".width_button").each (i,v) -> $(v).click ->
     drawing_option.width = $(v).attr('id').replace('width_','')
