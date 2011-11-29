@@ -80,6 +80,8 @@ connect_websocket = ->
         ws.send(JSON.stringify({type: "image_request"}))
       when "authorize_failed"
         add_system_log t('ui.authorize_failed')
+      when "another_connected"
+        add_system_log t('ui.another_connected')
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
