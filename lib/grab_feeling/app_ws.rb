@@ -139,7 +139,7 @@ module GrabFeeling
             when "draw"
               room = Room.find_by_id(i[:room_id])
 
-              if (round = room.rounds.last) && round.drawer && round.drawer_id != i[:player_id]
+              if (round = room.rounds.last) && round.drawer_id && round.drawer_id != i[:player_id]
                 ws.send({type: "draw_not_allowed"}.to_json)
               else
                 json["player_id"] = i[:player_id]
@@ -149,13 +149,17 @@ module GrabFeeling
             when "clear"
               room = Room.find_by_id(i[:room_id])
 
-              json["player_id"] = i[:player_id]
-              if @@image_requests[i[:room_id]]
-                @@image_requests[i[:room_id]][:buffer] = []
-                @@image_requests[i[:room_id]][:clear] = true
+              if (round = room.rounds.last) && round.drawer_id && round.drawer_id != i[:player_id]
+                ws.send({type: "draw_not_allowed"}.to_json)
+              else
+                json["player_id"] = i[:player_id]
+                if @@image_requests[i[:room_id]]
+                  @@image_requests[i[:room_id]][:buffer] = []
+                  @@image_requests[i[:room_id]][:clear] = true
+                end
+                room.add_system_log :cleared, name: i[:name]
+                @@pool.broadcast i[:room_id], json
               end
-              room.add_system_log :cleared, name: i[:name]
-              @@pool.broadcast i[:room_id], json
             when "start"
               if Player.find_by_id(i[:player_id]).admin
                 @@scheduler.add_game Room.find_by_id(i[:room_id])

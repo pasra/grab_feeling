@@ -174,7 +174,7 @@ $(document).ready ->
     drawing_option.width = $(v).attr('id').replace('width_','')
 
   $("#clear_button").click ->
-    ws.puts type: "clear"
+    ws.puts type: "clear" if canvas.drawing_allowed
 
   $("#snapshot").click ->
     window.open(canvas.toDataURL("image/png"))
