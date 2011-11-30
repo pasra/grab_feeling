@@ -119,6 +119,10 @@ connect_websocket = ->
         show_hide_drawing_tool()
       when "point"
         $("#player#{msg.player_id} .point").text(msg.point)
+      when "online"
+        $("#player#{msg.player_id}").removeClass('player_offline')
+      when "offline"
+        $("#player#{msg.player_id}").addClass('player_offline')
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"

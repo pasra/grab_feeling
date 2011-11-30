@@ -80,3 +80,7 @@ header *{
   margin:0;
   padding:0;
 }
+
+.player_offline {
+  color: gray;
+}
