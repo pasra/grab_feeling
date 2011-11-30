@@ -31,7 +31,7 @@ add_player = (player_id, name, point, online) ->
                     .text(name+"(") \
                     .append($("<span>").addClass('point') \
                                        .text(point)).append(")")
-  span.appendClass('player_offline') unless online
+  span.addClass('player_offline') unless online
   $("#player_list").append span
 
 connect_websocket = ->
