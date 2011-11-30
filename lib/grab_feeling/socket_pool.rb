@@ -63,8 +63,12 @@ module GrabFeeling
     def remove_(obj)
       return nil unless obj
       @sockets.delete(obj[:socket].__id__)
-      @pool[obj[:room_id]].delete(obj[:player_id]) unless obj[:replace]
-      @pool_player.delete(obj[:player_id]) unless obj[:replace]
+      unless obj[:replace]
+        Player.find_by_id(_[:player_id]).update_attributes! online: false, last_available: Time.now
+        self.broadcast obj[:room_id], type: :offline, player_id: obj[:player_id]
+        @pool[obj[:room_id]].delete(obj[:player_id])
+        @pool_player.delete(obj[:player_id])
+      end
       self
     end
   end

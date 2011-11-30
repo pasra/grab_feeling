@@ -74,6 +74,9 @@ module GrabFeeling
             _[:socket].close_websocket
           end
 
+          player.update_attributes! online: true, last_available: nil
+          @@pool.broadcast player.room_id, type: :online, player_id: player.id
+
           ws.send({type: "authorize_succeeded"}.to_json)
         else
           @@logger.info("#{ws.__id__}: Authorize failed")
@@ -189,14 +192,16 @@ module GrabFeeling
       end
 
       ws.onclose do
-        @@pool.remove(ws)#if (_ = @@pool.find(ws)) && !_[:replace]
+        @@pool.remove(ws)
+
         ping_timer.cancel
         timeout_check.cancel
         @@logger.info("#{ws.__id__}: closed")
       end
 
       ws.onerror do |e|
-        @@pool.remove(ws)#if (_ = @@pool.find(ws)) && !_[:replace]
+        @@pool.remove(ws)
+
         ping_timer.cancel if ping_timer
         timeout_check.cancel if timeout_check
         @@logger.error("#{ws.__id__}: closed (by error: #{e.message}}\n#{e.backtrace.join("\n")}")
