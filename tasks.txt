@@ -10,10 +10,9 @@
   * password
 
 # offline
-  * offline (if offline auto skip)
-  * last available data should be saved in DB
+  * skip offline player's turn
   * last admin is ping timeouted
-  * leaving during turn -> critical bug
+  * leaving or during turn -> critical bug
 
 # optional feature
   * pckles
