@@ -26,11 +26,13 @@ context = undefined
 drawing_option = {width: 3, color: '#2b2b2b', prev_colors: ['#2b2b2b']}
 ws = undefined
 
-add_player = (player_id, name, point) ->
-  $("#player_list").append $("<span>").attr('id',"player#{player_id}") \
-                                      .text(name+"(") \
-                                      .append($("<span>").addClass('point') \
-                                                         .text(point)).append(")")
+add_player = (player_id, name, point, online) ->
+  span = $("<span>").attr('id',"player#{player_id}") \
+                    .text(name+"(") \
+                    .append($("<span>").addClass('point') \
+                                       .text(point)).append(")")
+  span.appendClass('player_offline') unless online
+  $("#player_list").append span
 
 connect_websocket = ->
   add_system_log t('ui.connecting')
@@ -85,7 +87,7 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        add_player msg.player_id, msg.player_name, msg.player_point
+        add_player msg.player_id, msg.player_name, msg.player_point, msg.online
       when "leave"
         $("#player#{msg.player_id}").remove()
       when "system_log"
@@ -261,7 +263,8 @@ $(document).ready ->
       show_hide_drawing_tool()
 
     if room.players
-      add_player(player.id, player.name, player.point) for player in room.players
+      for player in room.players
+        add_player(player.id, player.name, player.point, player.online)
 
     if room.ends_at
       remaining_to = Date.parse(room.ends_at)

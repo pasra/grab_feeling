@@ -19,7 +19,9 @@ module GrabFeeling
         end
         session[@room.session_key] = @player.id
         Communicator.notify :join, room_id: room.id, player_id: @player.id,
-                                   player_name: @player.name, player_point: @player.point
+                                   player_name: @player.name,
+                                   player_point: @player.point,
+                                   online: @player.online
         room.add_system_log :player_joined, name: @player.name
         true
       else
