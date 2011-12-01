@@ -84,3 +84,8 @@ header *{
 .player_offline {
   color: gray;
 }
+
+.cursor {
+  position: absolute;
+  display: none;
+}

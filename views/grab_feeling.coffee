@@ -33,6 +33,7 @@ add_player = (player_id, name, point, online) ->
                                        .text(point)).append(")")
   span.addClass('player_offline') unless online
   $("#player_list").append span
+  $("#cursors").append($("<p>").attr({ id: player_id, class: "cursor"}).text(name))
 
 connect_websocket = ->
   add_system_log t('ui.connecting')
@@ -94,6 +95,7 @@ connect_websocket = ->
         add_system_log msg[room.locale]
       when "draw"
         unless room.player_id == msg.player_id
+          $(".cursor" + "##{msg.player_id}").css({top: msg.to.y, left: msg.to.x, display: "block"})
           if msg.fill
             canvas.fill_background msg.fill
           else
@@ -269,6 +271,11 @@ $(document).ready ->
       remaining_to = Date.parse(room.next_at)
 
     $("#start_button").show() if room.is_admin
+
+
+    hide_cursor = ->
+      $(".cursor").css("display", "none")
+    setInterval(hide_cursor, 1000)
 
     remaining_timer = ->
       if remaining_to
