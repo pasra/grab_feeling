@@ -95,10 +95,10 @@ connect_websocket = ->
         add_system_log msg[room.locale]
       when "draw"
         unless room.player_id == msg.player_id
-          $(".cursor" + "##{msg.player_id}").css({top: msg.to.y, left: msg.to.x, display: "block"})
           if msg.fill
             canvas.fill_background msg.fill
           else
+            $(".cursor" + "##{msg.player_id}").css({top: msg.to.y, left: msg.to.x, display: "block"})
             canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
