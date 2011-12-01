@@ -35,6 +35,10 @@ module GrabFeeling
       @@websocket = block
     end
 
+    hook_event :next_round do |msg|
+      Room.find_by_id(msg["room_id"]).next_round @@pool, false, true, Player.find_by_id(msg["next_player"])
+    end
+
     hook_event :hi do |msg|
       I18n.reload!
     end
@@ -47,6 +51,7 @@ module GrabFeeling
     end
 
     hook_event :leave do |msg|
+      @@pool.remove_by_player_id msg["player_id"]
       @@pool.broadcast msg["room_id"], type: :leave, player_id: msg["player_id"],
                                        player_name: msg["player_name"]
     end
@@ -121,6 +126,7 @@ module GrabFeeling
               @@logger.info("#{ws.__id__} requested a image...")
 
               players = (@@pool.find_by_room_id(i[:room_id]).values - [i]).select{|x| x[:loaded]}
+              p players
               if players.empty?
                 ws.send({type: "empty_image"}.to_json)
                 break

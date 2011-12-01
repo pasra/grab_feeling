@@ -14,6 +14,13 @@ class Player < ActiveRecord::Base
                                              player_name: self.name
     self.room.add_system_log :player_left, name: self.name
 
+    if self.room.in_game && self.room.rounds.last.drawer.id == self.id
+      next_drawer = self.next_player
+      next_drawer = next_drawer ? next_drawer.id : nil
+      GrabFeeling::Communicator.notify :next_round, room_id: self.room_id,
+                                                    next_drawer: next_drawer
+    end
+
     self.destroy
 
     if self.room.players.where(admin: true).empty?
@@ -21,7 +28,7 @@ class Player < ActiveRecord::Base
       self.room.save!
 
       self.room.add_system_log :room_end
-      Communicator.notify :room_end, room_id: self.room.id
+      GrabFeeling::Communicator.notify :room_end, room_id: self.room_id
     end
   end
 end

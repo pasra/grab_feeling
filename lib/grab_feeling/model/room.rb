@@ -27,26 +27,19 @@ class Room < ActiveRecord::Base
     self
   end
 
-  def next_round(pool, is_first=false)
+  def next_round(pool, is_first=false, next_specified=false, next_=nil)
     ActiveRecord::Base.transaction do
-      dic_rand = rand(self.dictionaries.count)+self.dictionaries.first.id
-      dictionary = self.dictionaries.where('id >= ?', dic_rand).first
-
-      theme = dictionary.themes.where('id >= ?', rand(dictionary.themes.count)+dictionary.themes.first.id).first
-
-      if is_first || !(last_round = self.rounds.last)
+     if is_first || !(last_round = self.rounds.last)
         drawer = self.players.where(online: true).first
         unless drawer
           self.add_system_log :no_online_players
-          self.update_attributes! in_game: false
+          self.update_attributes! in_game: false, round: 1
           return nil
         end
-      elsif (next_player = last_round.drawer.next_player)
+      elsif (next_specified ? next_ : (next_player = last_round.drawer.next_player))
         drawer = next_player
       elsif (self.round + 1) > self.max_round
-        self.round = 1
-        self.in_game = false
-        self.save!
+        self.update_attributes! in_game: false, round: 1
         return nil
       else
         self.round += 1
@@ -54,10 +47,14 @@ class Room < ActiveRecord::Base
         drawer = self.players.where(online: true).first
         unless drawer
           self.add_system_log :no_online_players
-          self.update_attributes! in_game: false
+          self.update_attributes! in_game: false, round: 1
           return nil
         end
       end
+
+      dic_rand = rand(self.dictionaries.count)+self.dictionaries.first.id
+      dictionary = self.dictionaries.where('id >= ?', dic_rand).first
+      theme = dictionary.themes.where('id >= ?', rand(dictionary.themes.count)+dictionary.themes.first.id).first
 
       time = Time.now
 
