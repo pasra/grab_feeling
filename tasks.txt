@@ -10,12 +10,12 @@
   * password
 
 # offline
-  * skip offline player's turn
+  * auto remove
   * last admin is ping timeouted
   * leaving or during turn -> critical bug
 
 # optional feature
-  * pckles
+  * upload snapshot gehirn storage
   * viewing
 
 # for admin

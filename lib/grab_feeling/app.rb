@@ -207,23 +207,11 @@ module GrabFeeling
       @player = @room.players.find_by_id(session[@room.session_key])
       return halt(403) unless @player
 
-      @room.players.delete @player
       session[@room.session_key] = nil
-      Communicator.notify :leave, room_id: @room.id, player_id: @player.id,
-                                 player_name: @player.name
-      @room.add_system_log :player_left, name: @player.name
 
-      if @room.players.find(:all, :conditions => ['admin = true']).empty?
-        @room.ended = true
-        @room.save!
+      @player.leave
 
-        @room.add_system_log :room_end
-        Communicator.notify :room_end, room_id: @room.id
-
-        redirect "/"
-      else
-        redirect "/g/#{@room.unique_id}"
-      end
+      redirect "/g/#{@room.unique_id}"
     end
 
     if development?
