@@ -35,6 +35,7 @@ module GrabFeeling
     def add(room_id, player_id, socket)
       player = Player.find_by_id(player_id)
       obj = {socket: socket, room_id: room_id, player_id: player_id, loaded: false}
+      (timer = Timeouter.for_player(player_id)) && timer.cancel
       obj[:name] = player ? player.name : "???"
       @pool[room_id] ||= {}
       @pool[room_id][player_id] = obj
@@ -65,11 +66,14 @@ module GrabFeeling
       @sockets.delete(obj[:socket].__id__)
       unless obj[:replace]
         Player.find_by_id(obj[:player_id]).update_attributes! online: false, last_available: Time.now
+        Timeouter.new obj[:room_id], obj[:player_id]
+
         self.broadcast obj[:room_id], type: :offline, player_id: obj[:player_id]
+
         @pool[obj[:room_id]].delete(obj[:player_id])
         @pool_player.delete(obj[:player_id])
       end
-      self
+      obj
     end
   end
 end

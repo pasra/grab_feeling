@@ -15,4 +15,5 @@ require 'grab_feeling/app'
 require 'grab_feeling/app_ws'
 require 'grab_feeling/communicator'
 require 'grab_feeling/scheduler'
+require 'grab_feeling/timeouter'
 

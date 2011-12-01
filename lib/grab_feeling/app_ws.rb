@@ -207,7 +207,7 @@ module GrabFeeling
       end
 
       ws.onclose do
-        @@pool.remove(ws)
+        _ = @@pool.remove(ws)
 
         ping_timer.cancel
         timeout_check.cancel
@@ -215,7 +215,7 @@ module GrabFeeling
       end
 
       ws.onerror do |e|
-        @@pool.remove(ws)
+        _ = @@pool.remove(ws)
 
         ping_timer.cancel if ping_timer
         timeout_check.cancel if timeout_check
