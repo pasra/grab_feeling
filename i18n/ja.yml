@@ -49,3 +49,4 @@ ja:
   round_start: "%{drawer} さんのターンが開始しました"
   correct: "%{name} さんが正解! %{point} 獲得!"
   game_start: "ゲーム開始です"
+  no_online_players: "オンラインのメンバーが存在しないためゲームを終了します"

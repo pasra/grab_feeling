@@ -35,7 +35,12 @@ class Room < ActiveRecord::Base
       theme = dictionary.themes.where('id >= ?', rand(dictionary.themes.count)+dictionary.themes.first.id).first
 
       if is_first || !(last_round = self.rounds.last)
-        drawer = self.players.first
+        drawer = self.players.where(online: true).first
+        unless drawer
+          self.add_system_log :no_online_players
+          self.update_attributes! in_game: false
+          return nil
+        end
       elsif (next_player = last_round.drawer.next_player)
         drawer = next_player
       elsif (self.round + 1) > self.max_round
@@ -46,7 +51,12 @@ class Room < ActiveRecord::Base
       else
         self.round += 1
         self.save!
-        drawer = self.players.first
+        drawer = self.players.where(online: true).first
+        unless drawer
+          self.add_system_log :no_online_players
+          self.update_attributes! in_game: false
+          return nil
+        end
       end
 
       time = Time.now
