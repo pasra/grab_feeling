@@ -106,9 +106,8 @@ connect_websocket = ->
         $("#topic").text(msg.topic)
       when "round"
         dbg msg
-        if msg.drawer != room.player_id
-          canvas.drawing_allowed = false
-          show_hide_drawing_tool()
+        canvas.drawing_allowed = (msg.drawer == room.player_id)
+        show_hide_drawing_tool()
         remaining_to = Date.parse(msg.ends_at)
         canvas.clear()
       when "round_end"
@@ -258,9 +257,7 @@ $(document).ready ->
     if room.topic
       $("#topic").text room.topic
 
-    if room.player_id != room.drawer_id
-      canvas.drawing_allowed = false
-      show_hide_drawing_tool()
+    #canvas.drawing_allowed = (room.player_id == room.drawer_id)
 
     if room.players
       for player in room.players
