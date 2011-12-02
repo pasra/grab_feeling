@@ -174,13 +174,14 @@ module GrabFeeling
       @room = Room.find_by_unique_id(params[:id])
       return halt(404) unless @room
 
-      if session[@room.session_key]
+      if session[@room.session_key] && Player.find_by_id(session[@room.session_key])
         @is_mobile = (/iPad/ =~ request.user_agent)
         @player = Player.find_by_id(session[@room.session_key])
         @transition = @@transitions[I18n.locale] || @@transitions[Config["default_language"].to_sym]
         Communicator.notify :hi
         haml :room
       else
+        session[@room.session_key] = nil if session[@room.session_key]
         haml :room_entrance
       end
     end
