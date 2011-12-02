@@ -33,6 +33,11 @@ add_player = (player_id, name, point, online) ->
                                        .text(point)).append(")")
   span.addClass('player_offline') unless online
   $("#player_list").append span
+  span[0].add_op = ->
+    ws.puts type: "op", to: player_id if ws
+  span[0].deop = ->
+    ws.puts type: "deop", to: player_id if ws
+
   $("#cursors").append($("<div>").attr(id: "cursor#{player_id}", class: "cursor").text(name))
 
 connect_websocket = ->
@@ -126,6 +131,14 @@ connect_websocket = ->
         $("#player#{msg.player_id}").removeClass('player_offline')
       when "offline"
         $("#player#{msg.player_id}").addClass('player_offline')
+      when "op"
+        if msg.player_id == room.player_id
+          room.is_admin = true
+          $(".admin_tool").show()
+      when "deop"
+        if msg.player_id == room.player_id
+          room.is_admin = false
+          $(".admin_tool").hide()
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"
@@ -272,7 +285,7 @@ $(document).ready ->
     if room.next_at
       remaining_to = Date.parse(room.next_at)
 
-    $("#start_button").show() if room.is_admin
+    $(".admin_tool").show() if room.is_admin
 
 
     hide_cursor = ->

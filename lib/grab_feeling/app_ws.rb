@@ -202,7 +202,22 @@ module GrabFeeling
             when "kick"
             when "skip"
             when "deop"
+              room = Room.find_by_id(i[:room_id])
+              if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first) && player.admin
+                player.update_attributes! admin: false
+                @@logger.info("mode -o #{player.id}@#{player.room_id}")
+                room.add_system_log :deop, name: player.name, from: i[:name]
+                @@pool.broadcast(i[:room_id], type: "deop", player_id: json["to"])
+              end
             when "op"
+              room = Room.find_by_id(i[:room_id])
+
+              if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first) && !player.admin
+                @@logger.info("mode +o #{player.id}@#{player.room_id}")
+                player.update_attributes! admin: true
+                room.add_system_log :add_op, name: player.name, from: i[:name]
+                @@pool.broadcast(i[:room_id], type: "op", player_id: json["to"])
+              end
             end
           end end
         rescue Exception
