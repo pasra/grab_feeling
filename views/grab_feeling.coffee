@@ -33,7 +33,7 @@ add_player = (player_id, name, point, online) ->
                                        .text(point)).append(")")
   span.addClass('player_offline') unless online
   $("#player_list").append span
-  $("#cursors").append($("<p>").attr({ id: player_id, class: "cursor"}).text(name))
+  $("#cursors").append($("<div>").attr(id: "cursor#{player_id}", class: "cursor").text(name))
 
 connect_websocket = ->
   add_system_log t('ui.connecting')
@@ -98,7 +98,7 @@ connect_websocket = ->
           if msg.fill
             canvas.fill_background msg.fill
           else
-            $(".cursor" + "##{msg.player_id}").css({top: msg.to.y, left: msg.to.x, display: "block", background: "white"})
+            $("#cursor#{msg.player_id}").css(top: msg.to.y, left: msg.to.x).show()
             canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
@@ -274,7 +274,7 @@ $(document).ready ->
 
 
     hide_cursor = ->
-      $(".cursor").css("display", "none")
+      $(".cursor").hide()
     setInterval(hide_cursor, 1000)
 
     remaining_timer = ->
