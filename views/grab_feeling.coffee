@@ -28,8 +28,8 @@ ws = undefined
 
 add_player = (opt) ->
   name = opt.player_name || opt.name
-  point = opt.player_point || opt.point
-  player_id = opt.player_id || opt.id
+  point = opt.player_point || opt.point || 0
+  player_id = opt.player_id || opt.id || 0
   online = opt.online
   admin = opt.admin
 
@@ -41,20 +41,18 @@ add_player = (opt) ->
   e.attr("id", "player#{player_id}")
   e.addClass('player_offline') unless online
 
-  e[0].add_op = ->
-    ws.puts type: "op", to: player_id if ws
-  e[0].deop = ->
-    ws.puts type: "deop", to: player_id if ws
-
   e.find(".add_op").click ->
     e.find(".add_op").hide()
     e.find(".deop").show()
-    e[0].add_op()
+    ws.puts type: "op", to: player_id if ws
 
   e.find(".deop").click ->
     e.find(".add_op").show()
     e.find(".deop").hide()
-    e[0].deop()
+    ws.puts type: "deop", to: player_id if ws
+
+  e.find(".kick").click ->
+    ws.puts type: "kick", to: player_id if ws
 
   if admin
     e.find(".add_op").hide()
@@ -170,6 +168,11 @@ connect_websocket = ->
           $(".admin_tool").hide()
         $("#player#{msg.player_id} .deop").hide()
         $("#player#{msg.player_id} .add_op").show()
+      when "kick"
+        if msg.player_id == room.player_id
+          canvas.drawing_allowed = false
+          show_hide_drawing_tool()
+          add_system_log t('ui.youre_kicked')
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"

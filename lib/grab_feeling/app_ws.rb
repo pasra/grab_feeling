@@ -14,7 +14,7 @@ module GrabFeeling
     @@pool = SocketPool.new
     @@event_hooks = {}
     @@logger = Logger.new(STDOUT)
-    @@websocket = ->{}
+    @@websocket ||= ->(ws){}
     @@image_requests = {}
     @@timeout = Config["websocket"]["timeout"]
     @@ping_interval = Config["websocket"]["ping_interval"]
@@ -200,6 +200,12 @@ module GrabFeeling
                 ws.send type: "forbidden"
               end
             when "kick"
+              room = Room.find_by_id(i[:room_id])
+              if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first)
+                @@pool.broadcast i[:room_id], type: :kick, from: i[:player_id], player_id: json["to"]
+                room.add_system_log :kicked, from: i[:name], name: player.name
+                player.leave
+              end
             when "skip"
             when "deop"
               room = Room.find_by_id(i[:room_id])
