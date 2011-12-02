@@ -12,7 +12,7 @@ class Room < ActiveRecord::Base
   validates_uniqueness_of :unique_id
 
   def session_key
-    :"player_#{self.id}"
+    :"player_#{self.unique_id}"
   end
 
   def add_system_log *args
