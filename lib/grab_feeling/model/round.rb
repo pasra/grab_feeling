@@ -39,7 +39,7 @@ class Round < ActiveRecord::Base
     if !is_last
       room.add_system_log :round_end,
                           next_game: self.next_at - Time.now,
-                          next_drawer: (self.drawer.next_player || room.players.first).name,
+                          next_drawer: ((self.drawer && self.drawer.next_player) || room.players.first).name,
                           answer: self.theme.text
     else
       room.add_system_log :last_round_end, answer: self.topic

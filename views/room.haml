@@ -3,14 +3,23 @@
   %head
     %meta{charset: "UTF-8"}
     %title= t(:title)
+
     %script{type: "text/javascript"}= @transition
-    - if GrabFeeling::Config["jquery"]
-      %script{src: GrabFeeling::Config["jquery"]}
+    - if (_ = GrabFeeling::Config["js_libraries"]) && _["jquery"]
+      %script{src: GrabFeeling::Config["js_libraries"]["jquery"]}
     - else
       %script{src: "http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"}
+
+    - if (_ = GrabFeeling::Config["js_libraries"]) && _["templou"]
+      %script{src: GrabFeeling::Config["js_libraries"]["templou"]}
+    - else
+      %script{src: "https://raw.github.com/hinassan/templou/master/templou.js"}
+
     %script{src: "/js/i18n.js"}
     %script{src: "/js/grab_feeling.js"}
+
     %link{rel: "stylesheet", type: "text/css", href: "/css/grab_feeling.css"}
+
     - if @is_mobile
       %link{rel: "stylesheet", type: "text/css", href: "/css/ipad_grab_feeling.css"}
       %meta{name: "apple-mobile-web-app-capable", content: "yes"}
@@ -34,6 +43,20 @@
           %div.drawing_tool
             %input.drawing_tool#clear_button{type: 'button', value: t('ui.clear')}
         %div#player_list
+          %ul
+          %span{templou: 'player'}
+            %span.player_name= "name"
+            = "("
+            %span.point= "0"
+            = ")"
+            %div.player_menu
+              %ul.admin_tool
+                %li
+                  %input.add_op{type: 'button', value: t('ui.add_op')}
+                %li
+                  %input.deop{type: 'button', value: t('ui.deop')}
+                %li
+                  %input.kick{type: 'button', value: t('ui.kick')}
         %div#clear
 
       %div#right

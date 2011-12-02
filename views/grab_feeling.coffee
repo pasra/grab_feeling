@@ -26,18 +26,45 @@ context = undefined
 drawing_option = {width: 3, color: '#2b2b2b', prev_colors: ['#2b2b2b']}
 ws = undefined
 
-add_player = (player_id, name, point, online) ->
-  span = $("<span>").attr('id',"player#{player_id}") \
-                    .text(name+"(") \
-                    .append($("<span>").addClass('point') \
-                                       .text(point)).append(")")
-  span.addClass('player_offline') unless online
-  $("#player_list").append span
-  span[0].add_op = ->
+add_player = (opt) ->
+  name = opt.player_name || opt.name
+  point = opt.player_point || opt.point
+  player_id = opt.player_id || opt.id
+  online = opt.online
+  admin = opt.admin
+
+  e = $tmp.player(".player_name": name,
+                  ".point": point.toString())
+  dbg e
+
+  e.addClass('player')
+  e.attr("id", "player#{player_id}")
+  e.addClass('player_offline') unless online
+
+  e[0].add_op = ->
     ws.puts type: "op", to: player_id if ws
-  span[0].deop = ->
+  e[0].deop = ->
     ws.puts type: "deop", to: player_id if ws
 
+  e.find(".add_op").click ->
+    e.find(".add_op").hide()
+    e.find(".deop").show()
+    e[0].add_op()
+
+  e.find(".deop").click ->
+    e.find(".add_op").show()
+    e.find(".deop").hide()
+    e[0].deop()
+
+  if admin
+    e.find(".add_op").hide()
+  else
+    e.find(".deop").hide()
+
+  # to be implemented
+  #e.children(".kick").click e[0].deop
+
+  $("#player_list").children("ul").append $("<li>").append(e)
   $("#cursors").append($("<div>").attr(id: "cursor#{player_id}", class: "cursor").text(name))
 
 connect_websocket = ->
@@ -93,7 +120,7 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        add_player msg.player_id, msg.player_name, msg.player_point, msg.online
+        add_player msg
       when "leave"
         $("#player#{msg.player_id}").remove()
       when "system_log"
@@ -259,6 +286,8 @@ $(document).ready ->
   $.getJSON("#{location.pathname}.json", (data) ->
     room = data
 
+    debug = room.debug
+
     if room.error
       add_system_log "Error: #{room.error}"
       return
@@ -277,8 +306,7 @@ $(document).ready ->
     #canvas.drawing_allowed = (room.player_id == room.drawer_id)
 
     if room.players
-      for player in room.players
-        add_player(player.id, player.name, player.point, player.online)
+      add_player player for player in room.players
 
     if room.ends_at
       remaining_to = Date.parse(room.ends_at)
@@ -313,7 +341,6 @@ $(document).ready ->
       ws.puts type: "ping" if ws
     setInterval pong_timer, 5000
 
-    debug = room.debug
     dbg room
 
     connect_websocket()

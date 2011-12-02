@@ -47,7 +47,7 @@ module GrabFeeling
       @@pool.broadcast msg["room_id"], type: :join, player_id: msg["player_id"],
                                        player_name: msg["player_name"],
                                        player_point: msg["player_point"],
-                                       online: msg["online"]
+                                       online: msg["online"], admin: msg["admin"]
     end
 
     hook_event :leave do |msg|

@@ -21,7 +21,7 @@ module GrabFeeling
         Communicator.notify :join, room_id: room.id, player_id: @player.id,
                                    player_name: @player.name,
                                    player_point: @player.point,
-                                   online: @player.online
+                                   online: @player.online, admin: @player.admin
         room.add_system_log :player_joined, name: @player.name
         true
       else

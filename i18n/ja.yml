@@ -39,6 +39,13 @@ ja:
       ten: 太さ10
     clear: クリア
     snapshot: スナップショット
+    add_op: +o
+    deop: -o
+    kick: 追放
+    hints:
+      add_op: オペレータにする
+      deop: オペレータ権限を剥奪
+      kick: ルームから追放する
   player_joined: "%{name} さんが参加しました"
   player_left: "%{name} さんが退室しました"
   say: 発言
