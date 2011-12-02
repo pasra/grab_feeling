@@ -98,7 +98,7 @@ connect_websocket = ->
           if msg.fill
             canvas.fill_background msg.fill
           else
-            $(".cursor" + "##{msg.player_id}").css({top: msg.to.y, left: msg.to.x, display: "block"})
+            $(".cursor" + "##{msg.player_id}").css({top: msg.to.y, left: msg.to.x, display: "block", background: "white"})
             canvas.draw msg.from, msg.to, msg.option
       when "image_requested"
         add_system_log t('ui.loading')
