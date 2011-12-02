@@ -158,11 +158,15 @@ module GrabFeeling
             when "chat"
               room = Room.find_by_id(i[:room_id])
 
-              @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
-              @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
-              room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
-              if room.in_game && !(round = room.rounds.last).done && round.drawer_id != i[:player_id] && (theme = round.theme).text == json["message"]
-                round.end @@pool, Player.find_by_id(i[:player_id])
+              if json["message"].empty?
+                ws.send({type: "empty_message"}.to_json)
+              else
+                @@logger.info("#{ws.__id__} said \"#{i[:name]}: #{json["message"]}\" at room #{i[:room_id]}")
+                @@pool.broadcast i[:room_id], type: "chat", from: i[:name], message: json["message"]
+                room.logs.create! player_id: i[:player_id], text: json["message"], name: i[:name]
+                if room.in_game && !(round = room.rounds.last).done && round.drawer_id != i[:player_id] && (theme = round.theme).text == json["message"]
+                  round.end @@pool, Player.find_by_id(i[:player_id])
+                end
               end
             when "draw"
               room = Room.find_by_id(i[:room_id])

@@ -200,7 +200,7 @@ $(document).ready ->
 
   $("#chat_form").submit (e) ->
     e.preventDefault()
-    if ws
+    if $("#chat_field").val().length > 0 && ws
       ws.puts type: "chat", message: $("#chat_field").val()
       $("#chat_field").val("")
 
