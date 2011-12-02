@@ -25,9 +25,11 @@ module GrabFeeling
     end
 
     def fire
-      Player.find_by_id(@player_id).leave
+      if player = Player.find_by_id(@player_id)
+        player.leave
+      end
+
       remove
-      nil
     end
 
     def remove
