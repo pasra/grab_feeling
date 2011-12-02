@@ -162,10 +162,14 @@ connect_websocket = ->
         if msg.player_id == room.player_id
           room.is_admin = true
           $(".admin_tool").show()
+        $("#player#{msg.player_id} .deop").show()
+        $("#player#{msg.player_id} .add_op").hide()
       when "deop"
         if msg.player_id == room.player_id
           room.is_admin = false
           $(".admin_tool").hide()
+        $("#player#{msg.player_id} .deop").hide()
+        $("#player#{msg.player_id} .add_op").show()
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"
