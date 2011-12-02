@@ -89,6 +89,7 @@ header *{
   position: absolute;
   display: none;
   border: 1px solid gray;
-  padding: 5px 10px;
+  background-color: white;
+  padding: 2px 3px;
   margin: 0px;
 }
