@@ -204,6 +204,9 @@ module GrabFeeling
               if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first)
                 @@pool.broadcast i[:room_id], type: :kick, from: i[:player_id], player_id: json["to"]
                 room.add_system_log :kicked, from: i[:name], name: player.name
+                if (connection = @@pool.find_by_player_id(json["to"]))
+                  connection[:socket].close_websocket
+                end
                 player.leave
               end
             when "skip"
