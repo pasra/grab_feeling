@@ -94,7 +94,7 @@ module GrabFeeling
             end
 
             socket_wo_drawer = @pool.find_by_room_id(room.id).reject do |k,pl|
-              pl[:player_id] == round.drawer.id
+              pl[:player_id] == round.drawer_id
             end
             @pool.broadcast_to socket_wo_drawer, type: :topic, topic: opened
           end
