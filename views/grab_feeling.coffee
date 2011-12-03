@@ -13,7 +13,8 @@ add_chat_log = (name, message) ->
   $("#chat_log").append p
   $("#chat_log")[0].scrollTop = $("#chat_log")[0].scrollHeight
 
-
+disconnect_reason = undefined
+reconnect_wait = -5000
 room = undefined
 
 show_hide_tools = ->
@@ -46,8 +47,6 @@ show_hide_tools = ->
   else
     dbg "hide admin_tool"
     $(".admin_tool").hide()
-
-
 
 remaining_to = undefined
 canvas = undefined
@@ -141,9 +140,9 @@ connect_websocket = ->
         add_system_log t('ui.connected')
         ws.send(JSON.stringify({type: "image_request"}))
       when "authorize_failed"
-        add_system_log t('ui.authorize_failed')
+        disconnect_reason = t('ui.authorize_failed')
       when "another_connected"
-        add_system_log t('ui.another_connected')
+        disconnect_reason = t('ui.another_connected')
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
@@ -207,13 +206,14 @@ connect_websocket = ->
         if msg.player_id == room.player_id
           canvas.drawing_allowed = false
           show_hide_tools()
-          add_system_log t('ui.youre_kicked')
+          disconnect_reason = t('ui.youre_kicked')
 #      when "needs_token"
   ws.onerror = (e) ->
-    add_system_log "Socket Error: #{e}"
+    add_system_log "#{t('ui.errord')}: #{e}"
+    reconnect()
     dbg e
   ws.onclose = (e) ->
-    add_system_log "#{t('ui.closed')}: #{e}"
+    reconnect()
     dbg e
 
 setup_canvas = ->
@@ -273,68 +273,11 @@ setup_canvas = ->
   $(canvas).mouseout drawed
   $(canvas).bind 'touchend', drawed
 
-$(document).ready ->
-  setup_canvas()
-
-  add_system_log t('ui.retriving_data')
-
-  $("#start_button").hide()
-
-  $("#chat_form").submit (e) ->
-    e.preventDefault()
-    if $("#chat_field").val().length > 0 && ws
-      ws.puts type: "chat", message: $("#chat_field").val()
-      $("#chat_field").val("")
-
-  #colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "c0c0c0", "ffffff"]
-  colors = ["e60033", "f0908d", "ee7800", "ffd900", "98d98e", "007b43", "00552e", "a0d8ef", "1e50a2", "65318e", "6f4b3e", "c0c0c0", "2b2b2b", "ffffff"]
-  for color in colors
-    container = $("<div>").addClass('color_button_container')
-    container.append $("<div>").css('background-color', "##{color}") \
-                                 .attr('id', "color_#{color}") \
-                                 .addClass('color_button')
-    $("#colors").append container
-
-  $("#color_2b2b2b").parent().addClass('color_selected')
-
-  color_select = (e) ->
-    $(".color_selected").removeClass('color_selected')
-    drawing_option.prev_colors.unshift drawing_option.color
-    drawing_option.color = $(e.target).attr('id').replace('color_','#')
-    $(e.target).parent().addClass('color_selected')
-
-  $("div.color_button").click color_select
-
-  $("div.color_button").dblclick (e) ->
-    color = $(e.target).attr('id').replace('color_','#')
-    color_select target: $("#color_#{drawing_option.prev_colors[2].replace('#','')}")[0]
-    drawing_option.prev_colors = [drawing_option.color]
-    if canvas.drawing_allowed
-      canvas.fill_background color
-      ws.puts type: "draw", fill: color
-
-  $(".width_button").each (i,v) -> $(v).click ->
-    drawing_option.width = $(v).attr('id').replace('width_','')
-
-  $("#clear_button").click ->
-    ws.puts type: "clear" if canvas.drawing_allowed
-
-  $("#snapshot").click ->
-    window.open(canvas.toDataURL("image/png"))
-
-  $("#start_button").click -> if ws && room.is_admin
-    ws.puts type: "start"
-
-  $("#skip_button").click -> if ws && room.is_admin && room.in_turn
-    ws.puts type: "skip"
-
-  $("#end_button").click -> if ws && room.is_admin
-    ws.puts type: "shutdown"
-
-
-
-
+prepare_connect = ->
   $.getJSON("#{location.pathname}.json", (data) ->
+    $(".log").html('')
+    $("#player_list").html('')
+
     room = data
 
     debug = room.debug
@@ -401,3 +344,74 @@ $(document).ready ->
     connect_websocket()
   ).error((xhr, text, e) -> add_system_log "oops? #{text} - #{e}")
 
+reconnect = ->
+  if disconnect_reason
+    add_system_log t('ui.disconnected')
+    add_system_log disconnect_reason
+  else
+    add_system_log t('ui.try_reconnect')
+    reconnect_wait += 5000
+    dbg reconnect_wait
+    setTimeout prepare_connect, reconnect_wait
+
+init = ->
+  setup_canvas()
+
+  add_system_log t('ui.retriving_data')
+
+  $("#start_button").hide()
+
+  $("#chat_form").submit (e) ->
+    e.preventDefault()
+    if $("#chat_field").val().length > 0 && ws
+      ws.puts type: "chat", message: $("#chat_field").val()
+      $("#chat_field").val("")
+
+  #colors = ["e60033", "007b43", "6f4b3e", "a0d8ef", "1e50a2", "ee7800", "65318e", "98d98e", "00552e", "2b2b2b", "ffd900", "f0908d", "000000", "c0c0c0", "ffffff"]
+  colors = ["e60033", "f0908d", "ee7800", "ffd900", "98d98e", "007b43", "00552e", "a0d8ef", "1e50a2", "65318e", "6f4b3e", "c0c0c0", "2b2b2b", "ffffff"]
+  for color in colors
+    container = $("<div>").addClass('color_button_container')
+    container.append $("<div>").css('background-color', "##{color}") \
+                                 .attr('id', "color_#{color}") \
+                                 .addClass('color_button')
+    $("#colors").append container
+
+  $("#color_2b2b2b").parent().addClass('color_selected')
+
+  color_select = (e) ->
+    $(".color_selected").removeClass('color_selected')
+    drawing_option.prev_colors.unshift drawing_option.color
+    drawing_option.color = $(e.target).attr('id').replace('color_','#')
+    $(e.target).parent().addClass('color_selected')
+
+  $("div.color_button").click color_select
+
+  $("div.color_button").dblclick (e) ->
+    color = $(e.target).attr('id').replace('color_','#')
+    color_select target: $("#color_#{drawing_option.prev_colors[2].replace('#','')}")[0]
+    drawing_option.prev_colors = [drawing_option.color]
+    if canvas.drawing_allowed
+      canvas.fill_background color
+      ws.puts type: "draw", fill: color
+
+  $(".width_button").each (i,v) -> $(v).click ->
+    drawing_option.width = $(v).attr('id').replace('width_','')
+
+  $("#clear_button").click ->
+    ws.puts type: "clear" if canvas.drawing_allowed
+
+  $("#snapshot").click ->
+    window.open(canvas.toDataURL("image/png"))
+
+  $("#start_button").click -> if ws && room.is_admin
+    ws.puts type: "start"
+
+  $("#skip_button").click -> if ws && room.is_admin && room.in_turn
+    ws.puts type: "skip"
+
+  $("#end_button").click -> if ws && room.is_admin
+    ws.puts type: "shutdown"
+
+  prepare_connect()
+
+$(document).ready init
