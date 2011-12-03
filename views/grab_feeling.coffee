@@ -13,26 +13,85 @@ add_chat_log = (name, message) ->
   $("#chat_log").append p
   $("#chat_log")[0].scrollTop = $("#chat_log")[0].scrollHeight
 
-show_hide_drawing_tool = ->
-  if canvas.drawing_allowed
-    $(".drawing_tool").show()
-  else
-    $(".drawing_tool").hide()
 
 room = undefined
+
+show_hide_tools = ->
+  if canvas.drawing_allowed
+    dbg "show drawing"
+    $(".drawing_tool").show()
+  else
+    dbg "hide drawing"
+    $(".drawing_tool").hide()
+
+  if room && room.in_game
+    dbg "show in_game"
+    $(".in_game_tool").show()
+  else
+    dbg "hide in_game"
+    $(".in_game_tool").hide()
+
+  if room && room.in_turn
+    dbg "show in_turn"
+    $(".in_turn_tool").show()
+  else
+    dbg "hide in_turn"
+    $(".in_turn_tool").hide()
+
+  if room && room.is_admin
+    dbg "show admin_tool"
+    $(".admin_tool").show()
+    $(".in_turn_tool.admin_tool").hide() unless room.in_turn
+    $(".in_game_tool.admin_tool").hide() unless room.in_game
+  else
+    dbg "hide admin_tool"
+    $(".admin_tool").hide()
+
+
+
 remaining_to = undefined
 canvas = undefined
 context = undefined
 drawing_option = {width: 3, color: '#2b2b2b', prev_colors: ['#2b2b2b']}
 ws = undefined
 
-add_player = (player_id, name, point, online) ->
-  span = $("<span>").attr('id',"player#{player_id}") \
-                    .text(name+"(") \
-                    .append($("<span>").addClass('point') \
-                                       .text(point)).append(")")
-  span.addClass('player_offline') unless online
-  $("#player_list").append span
+add_player = (opt) ->
+  name = opt.player_name || opt.name
+  point = opt.player_point || opt.point || 0
+  player_id = opt.player_id || opt.id || 0
+  online = opt.online
+  admin = opt.admin
+
+  e = $tmp.player(".player_name": name,
+                  ".point": point.toString())
+  dbg e
+
+  e.addClass('player')
+  e.attr("id", "player#{player_id}")
+  e.addClass('player_offline') unless online
+
+  e.find(".add_op").click ->
+    e.find(".add_op").hide()
+    e.find(".deop").show()
+    ws.puts type: "op", to: player_id if ws
+
+  e.find(".deop").click ->
+    e.find(".add_op").show()
+    e.find(".deop").hide()
+    ws.puts type: "deop", to: player_id if ws
+
+  e.find(".kick").click ->
+    ws.puts type: "kick", to: player_id if ws
+
+  if admin
+    e.find(".add_op").hide()
+  else
+    e.find(".deop").hide()
+
+  # to be implemented
+  #e.children(".kick").click e[0].deop
+
+  $("#player_list").children("ul").append $("<li>").append(e)
   $("#cursors").append($("<div>").attr(id: "cursor#{player_id}", class: "cursor").text(name))
 
 connect_websocket = ->
@@ -57,7 +116,7 @@ connect_websocket = ->
           add_system_log t('ui.loaded')
           ws.puts type: "image_loaded"
           canvas.drawing_allowed = (room.player_id == room.drawer_id)
-          show_hide_drawing_tool()
+          show_hide_tools()
 
         if msg.clear
           draw_buffer()
@@ -74,7 +133,7 @@ connect_websocket = ->
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
         canvas.drawing_allowed = (room.player_id == room.drawer_id)
-        show_hide_drawing_tool()
+        show_hide_tools()
       when "image_request"
         dbg "Returning image"
         ws.puts type: "image", image: canvas.toDataURL("image/png")
@@ -88,7 +147,7 @@ connect_websocket = ->
       when "chat"
         add_chat_log msg.from, msg.message
       when "join"
-        add_player msg.player_id, msg.player_name, msg.player_point, msg.online
+        add_player msg
       when "leave"
         $("#player#{msg.player_id}").remove()
       when "system_log"
@@ -108,24 +167,47 @@ connect_websocket = ->
         $("#topic").text(msg.topic)
       when "round"
         dbg msg
-        canvas.drawing_allowed = (msg.drawer == room.player_id)
-        show_hide_drawing_tool()
         remaining_to = Date.parse(msg.ends_at)
+        canvas.drawing_allowed = (msg.drawer == room.player_id)
+        room.in_turn = true
+        room.in_game = true
+        show_hide_tools()
         canvas.clear()
       when "round_end"
         canvas.drawing_allowed = true
-        show_hide_drawing_tool()
+        room.in_turn = false
+        room.in_game = true
+        show_hide_tools()
         remaining_to = Date.parse(msg.next_at)
       when "game_end"
         canvas.drawing_allowed = true
         remaining_to = undefined
-        show_hide_drawing_tool()
+        room.in_turn = false
+        room.in_game = false
+        show_hide_tools()
       when "point"
         $("#player#{msg.player_id} .point").text(msg.point)
       when "online"
         $("#player#{msg.player_id}").removeClass('player_offline')
       when "offline"
         $("#player#{msg.player_id}").addClass('player_offline')
+      when "op"
+        if msg.player_id == room.player_id
+          room.is_admin = true
+          show_hide_tools()
+        $("#player#{msg.player_id} .deop").show()
+        $("#player#{msg.player_id} .add_op").hide()
+      when "deop"
+        if msg.player_id == room.player_id
+          room.is_admin = false
+          show_hide_tools()
+        $("#player#{msg.player_id} .deop").hide()
+        $("#player#{msg.player_id} .add_op").show()
+      when "kick"
+        if msg.player_id == room.player_id
+          canvas.drawing_allowed = false
+          show_hide_tools()
+          add_system_log t('ui.youre_kicked')
 #      when "needs_token"
   ws.onerror = (e) ->
     add_system_log "Socket Error: #{e}"
@@ -142,7 +224,7 @@ setup_canvas = ->
 
   canvas.drawing = false
   canvas.drawing_allowed = false
-  show_hide_drawing_tool()
+  show_hide_tools()
 
   canvas.pointer = (e) ->
     {x: e.clientX - r.left, y: e.clientY - r.top}
@@ -243,8 +325,19 @@ $(document).ready ->
   $("#start_button").click -> if ws && room.is_admin
     ws.puts type: "start"
 
+  $("#skip_button").click -> if ws && room.is_admin && room.in_turn
+    ws.puts type: "skip"
+
+  $("#end_button").click -> if ws && room.is_admin
+    ws.puts type: "shutdown"
+
+
+
+
   $.getJSON("#{location.pathname}.json", (data) ->
     room = data
+
+    debug = room.debug
 
     if room.error
       add_system_log "Error: #{room.error}"
@@ -264,15 +357,18 @@ $(document).ready ->
     #canvas.drawing_allowed = (room.player_id == room.drawer_id)
 
     if room.players
-      for player in room.players
-        add_player(player.id, player.name, player.point, player.online)
+      add_player player for player in room.players
+
+    room.in_turn = false
 
     if room.ends_at
+      room.in_turn = true
       remaining_to = Date.parse(room.ends_at)
     if room.next_at
+      room.in_turn = true
       remaining_to = Date.parse(room.next_at)
 
-    $("#start_button").show() if room.is_admin
+    $(".admin_tool").show() if room.is_admin
 
 
     hide_cursor = ->
@@ -300,7 +396,6 @@ $(document).ready ->
       ws.puts type: "ping" if ws
     setInterval pong_timer, 5000
 
-    debug = room.debug
     dbg room
 
     connect_websocket()

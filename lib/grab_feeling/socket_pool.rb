@@ -65,7 +65,9 @@ module GrabFeeling
       return nil unless obj
       @sockets.delete(obj[:socket].__id__)
       unless obj[:replace]
-        Player.find_by_id(obj[:player_id]).update_attributes! online: false, last_available: Time.now
+        (player = Player.find_by_id(obj[:player_id])) &&
+          player.update_attributes!(online: false, last_available: Time.now)
+
         Timeouter.new obj[:room_id], obj[:player_id]
 
         self.broadcast obj[:room_id], type: :offline, player_id: obj[:player_id]

@@ -43,6 +43,20 @@ module GrabFeeling
       @rooms[room_id][1] = true
     end
 
+    def end_game(room_id)
+      if room_ary = @rooms.delete(room_id)
+        room = room_ary[0]
+        @pool.broadcast room.id, type: :game_end
+        @pool.broadcast room.id, type: :topic, topic: ""
+        room.in_game = false
+        room.round = 1
+        room.save!
+        room.rounds.delete_all
+        room.add_system_log :game_end
+        self
+      end
+    end
+
     def tick
       ActiveRecord::Base.connection_pool.with_connection do
         @rooms.each do |id,(room, flag)|
@@ -55,14 +69,8 @@ module GrabFeeling
             unless (round = room.next_round(@pool))
               # Game end
               # TODO: ranking
-              @rooms.delete(id)
-              @pool.broadcast room.id, type: :game_end
-              @pool.broadcast room.id, type: :topic, topic: ""
-              room.in_game = false
-              room.round = 1
-              room.save!
-              room.rounds.delete_all
-              room.add_system_log :game_end
+
+              end_game(id)
             end
           elsif round.ends_at < Time.now
             # Round - end

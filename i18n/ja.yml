@@ -39,14 +39,28 @@ ja:
       ten: 太さ10
     clear: クリア
     snapshot: スナップショット
+    add_op: +o
+    deop: -o
+    kick: 追放
+    skip: スキップする
+    end: ゲーム終了
+    youre_kicked: "追放されました"
+    hints:
+      add_op: オペレータにする
+      deop: オペレータ権限を剥奪
+      kick: ルームから追放する
   player_joined: "%{name} さんが参加しました"
   player_left: "%{name} さんが退室しました"
   say: 発言
+  kicked: "%{from} さんが %{name} さんを追放しました"
   cleared: "%{name} さんがクリアしました"
   game_end: "ゲーム終了です"
   round_end: "ターン終了; 正解は「%{answer}」でした! %{next_game} 秒後に次の %{next_drawer} さんのターンが始まります"
   last_round_end: "ターン終了! 正解は「%{answer}」でした!"
   round_start: "%{drawer} さんのターンが開始しました"
   correct: "%{name} さんが正解! %{point} 獲得!"
+  skiped: "%{name} さんがターンをスキップしました"
   game_start: "ゲーム開始です"
   no_online_players: "オンラインのメンバーが存在しないためゲームを終了します"
+  add_op: "%{from} さんが %{name} さんをオペレータにしました"
+  deop: "%{from} さんが %{name} さんをオペレータから外しました"

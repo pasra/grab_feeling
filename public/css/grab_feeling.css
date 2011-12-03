@@ -1,3 +1,5 @@
+* { font-family: sans-serif; }
+
 #the_canvas {
   border: 1px solid black;
 }
@@ -92,4 +94,40 @@ header *{
   background-color: white;
   padding: 2px 3px;
   margin: 0px;
+}
+
+.player_menu {
+  display: none;
+}
+
+.player:hover .player_menu, .player_menu:hover {
+  display: block;
+  position: absolute;
+  bottom: -2px;
+  margin-bottom: 10px;
+  background-color: white;
+  height: 30px;
+  border: 1px solid gray;
+}
+
+#player_list ul, .player_menu ul {
+  margin-left: 0px;
+  padding-left: 0px;
+  margin-top: 0px;
+  padding-top: 0px;
+}
+
+#player_list ul li {
+  list-style: none;
+  margin-right: 10px;
+  float: left;
+}
+
+.player_menu ul li {
+  list-style: none;
+  margin-right: 0px;
+}
+
+.admin_menu_hint {
+  height: 16px;
 }

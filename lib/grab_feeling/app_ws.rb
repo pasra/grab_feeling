@@ -14,7 +14,7 @@ module GrabFeeling
     @@pool = SocketPool.new
     @@event_hooks = {}
     @@logger = Logger.new(STDOUT)
-    @@websocket = ->{}
+    @@websocket ||= ->(ws){}
     @@image_requests = {}
     @@timeout = Config["websocket"]["timeout"]
     @@ping_interval = Config["websocket"]["ping_interval"]
@@ -47,7 +47,7 @@ module GrabFeeling
       @@pool.broadcast msg["room_id"], type: :join, player_id: msg["player_id"],
                                        player_name: msg["player_name"],
                                        player_point: msg["player_point"],
-                                       online: msg["online"]
+                                       online: msg["online"], admin: msg["admin"]
     end
 
     hook_event :leave do |msg|
@@ -199,10 +199,45 @@ module GrabFeeling
               else
                 ws.send type: "forbidden"
               end
+            when "shutdown"
+              if Player.find_by_id(i[:player_id]).admin
+                @@scheduler.end_game i[:room_id]
+              else
+                ws.send type: "forbidden"
+              end
             when "kick"
+              room = Room.find_by_id(i[:room_id])
+              if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first)
+                @@pool.broadcast i[:room_id], type: :kick, from: i[:player_id], player_id: json["to"]
+                room.add_system_log :kicked, from: i[:name], name: player.name
+                if (connection = @@pool.find_by_player_id(json["to"]))
+                  connection[:socket].close_websocket
+                end
+                player.leave
+              end
             when "skip"
+              room = Room.find_by_id(i[:room_id])
+              if room.in_game && (round = room.rounds.last) && (from = room.players.where(id: i[:player_id]).first) && from.admin
+                room.add_system_log :skiped, name: i[:name]
+                round.end(@@pool, nil, true)
+              end
             when "deop"
+              room = Room.find_by_id(i[:room_id])
+              if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first) && player.admin
+                player.update_attributes! admin: false
+                @@logger.info("mode -o #{player.id}@#{player.room_id}")
+                room.add_system_log :deop, name: player.name, from: i[:name]
+                @@pool.broadcast(i[:room_id], type: "deop", player_id: json["to"])
+              end
             when "op"
+              room = Room.find_by_id(i[:room_id])
+
+              if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first) && !player.admin
+                @@logger.info("mode +o #{player.id}@#{player.room_id}")
+                player.update_attributes! admin: true
+                room.add_system_log :add_op, name: player.name, from: i[:name]
+                @@pool.broadcast(i[:room_id], type: "op", player_id: json["to"])
+              end
             end
           end end
         rescue Exception
