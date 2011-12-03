@@ -43,6 +43,7 @@ ja:
     deop: -o
     kick: 追放
     skip: スキップする
+    end: ゲーム終了
     youre_kicked: "追放されました"
     hints:
       add_op: オペレータにする

@@ -24,19 +24,30 @@ show_hide_tools = ->
     dbg "hide drawing"
     $(".drawing_tool").hide()
 
-  if room && room.is_admin
-    dbg "show admin_tool"
-    $(".admin_tool").show()
-  else
-    dbg "hide admin_tool"
-    $(".admin_tool").hide()
-
-  if room && room.in_turn
+  if room && room.in_game
     dbg "show in_game"
     $(".in_game_tool").show()
   else
     dbg "hide in_game"
     $(".in_game_tool").hide()
+
+  if room && room.in_turn
+    dbg "show in_turn"
+    $(".in_turn_tool").show()
+  else
+    dbg "hide in_turn"
+    $(".in_turn_tool").hide()
+
+  if room && room.is_admin
+    dbg "show admin_tool"
+    $(".admin_tool").show()
+    $(".in_turn_tool.admin_tool").hide() unless room.in_turn
+    $(".in_game_tool.admin_tool").hide() unless room.in_game
+  else
+    dbg "hide admin_tool"
+    $(".admin_tool").hide()
+
+
 
 remaining_to = undefined
 canvas = undefined
@@ -316,6 +327,11 @@ $(document).ready ->
 
   $("#skip_button").click -> if ws && room.is_admin && room.in_turn
     ws.puts type: "skip"
+
+  $("#end_button").click -> if ws && room.is_admin
+    ws.puts type: "shutdown"
+
+
 
 
   $.getJSON("#{location.pathname}.json", (data) ->

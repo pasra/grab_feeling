@@ -199,6 +199,12 @@ module GrabFeeling
               else
                 ws.send type: "forbidden"
               end
+            when "shutdown"
+              if Player.find_by_id(i[:player_id]).admin
+                @@scheduler.end_game i[:room_id]
+              else
+                ws.send type: "forbidden"
+              end
             when "kick"
               room = Room.find_by_id(i[:room_id])
               if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first)
