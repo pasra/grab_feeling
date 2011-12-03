@@ -64,6 +64,7 @@
           %p
             %input#snapshot{type: 'button', value: t('ui.snapshot')}
             %input.admin_tool#start_button{type: 'button', value: t('ui.start')}
+            %input.admin_tool.in_game_tool#skip_button{type: 'button', value: t('ui.skip')}
             %form{action: "/g/#{@room.unique_id}/leave", method: "POST"}
               %input{type: "submit", name: "leave", value: t(:leave)}
         %div#logs

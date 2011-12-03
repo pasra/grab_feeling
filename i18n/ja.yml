@@ -42,6 +42,7 @@ ja:
     add_op: +o
     deop: -o
     kick: 追放
+    skip: スキップする
     youre_kicked: "追放されました"
     hints:
       add_op: オペレータにする
@@ -57,6 +58,7 @@ ja:
   last_round_end: "ターン終了! 正解は「%{answer}」でした!"
   round_start: "%{drawer} さんのターンが開始しました"
   correct: "%{name} さんが正解! %{point} 獲得!"
+  skiped: "%{name} さんがターンをスキップしました"
   game_start: "ゲーム開始です"
   no_online_players: "オンラインのメンバーが存在しないためゲームを終了します"
   add_op: "%{from} さんが %{name} さんをオペレータにしました"

@@ -10,18 +10,21 @@ class Round < ActiveRecord::Base
     self.started_at + GrabFeeling::Config["operation"]["turn"]
   end
 
-  def end(pool, answerer = nil)
+  def end(pool, answerer = nil, next_right_now=false)
     point = (self.ends_at - Time.now).to_i
 
     pool.broadcast self.room_id, type: :round_end
 
     is_last = (self.ends_at == self.next_at)
 
+    if answerer || next_right_now
+      self.next_at = Time.now + (is_last ? 0 : GrabFeeling::Config["operation"]["interval"])
+    end
+
     if answerer
       pool.broadcast self.room_id,  type: :correct, player_id: answerer.id,
                                     point: point, answer: theme.text
 
-      self.next_at = Time.now + (is_last ? 0 : GrabFeeling::Config["operation"]["interval"])
       [self.drawer, answerer].each do |player|
         player.point += point
         player.save!

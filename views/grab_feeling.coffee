@@ -13,13 +13,31 @@ add_chat_log = (name, message) ->
   $("#chat_log").append p
   $("#chat_log")[0].scrollTop = $("#chat_log")[0].scrollHeight
 
-show_hide_drawing_tool = ->
-  if canvas.drawing_allowed
-    $(".drawing_tool").show()
-  else
-    $(".drawing_tool").hide()
 
 room = undefined
+
+show_hide_tools = ->
+  if canvas.drawing_allowed
+    dbg "show drawing"
+    $(".drawing_tool").show()
+  else
+    dbg "hide drawing"
+    $(".drawing_tool").hide()
+
+  if room && room.is_admin
+    dbg "show admin_tool"
+    $(".admin_tool").show()
+  else
+    dbg "hide admin_tool"
+    $(".admin_tool").hide()
+
+  if room && room.in_turn
+    dbg "show in_game"
+    $(".in_game_tool").show()
+  else
+    dbg "hide in_game"
+    $(".in_game_tool").hide()
+
 remaining_to = undefined
 canvas = undefined
 context = undefined
@@ -87,7 +105,7 @@ connect_websocket = ->
           add_system_log t('ui.loaded')
           ws.puts type: "image_loaded"
           canvas.drawing_allowed = (room.player_id == room.drawer_id)
-          show_hide_drawing_tool()
+          show_hide_tools()
 
         if msg.clear
           draw_buffer()
@@ -104,7 +122,7 @@ connect_websocket = ->
         add_system_log t('ui.loaded')
         ws.puts type: "image_loaded"
         canvas.drawing_allowed = (room.player_id == room.drawer_id)
-        show_hide_drawing_tool()
+        show_hide_tools()
       when "image_request"
         dbg "Returning image"
         ws.puts type: "image", image: canvas.toDataURL("image/png")
@@ -138,18 +156,24 @@ connect_websocket = ->
         $("#topic").text(msg.topic)
       when "round"
         dbg msg
-        canvas.drawing_allowed = (msg.drawer == room.player_id)
-        show_hide_drawing_tool()
         remaining_to = Date.parse(msg.ends_at)
+        canvas.drawing_allowed = (msg.drawer == room.player_id)
+        room.in_turn = true
+        room.in_game = true
+        show_hide_tools()
         canvas.clear()
       when "round_end"
         canvas.drawing_allowed = true
-        show_hide_drawing_tool()
+        room.in_turn = false
+        room.in_game = true
+        show_hide_tools()
         remaining_to = Date.parse(msg.next_at)
       when "game_end"
         canvas.drawing_allowed = true
         remaining_to = undefined
-        show_hide_drawing_tool()
+        room.in_turn = false
+        room.in_game = false
+        show_hide_tools()
       when "point"
         $("#player#{msg.player_id} .point").text(msg.point)
       when "online"
@@ -159,19 +183,19 @@ connect_websocket = ->
       when "op"
         if msg.player_id == room.player_id
           room.is_admin = true
-          $(".admin_tool").show()
+          show_hide_tools()
         $("#player#{msg.player_id} .deop").show()
         $("#player#{msg.player_id} .add_op").hide()
       when "deop"
         if msg.player_id == room.player_id
           room.is_admin = false
-          $(".admin_tool").hide()
+          show_hide_tools()
         $("#player#{msg.player_id} .deop").hide()
         $("#player#{msg.player_id} .add_op").show()
       when "kick"
         if msg.player_id == room.player_id
           canvas.drawing_allowed = false
-          show_hide_drawing_tool()
+          show_hide_tools()
           add_system_log t('ui.youre_kicked')
 #      when "needs_token"
   ws.onerror = (e) ->
@@ -189,7 +213,7 @@ setup_canvas = ->
 
   canvas.drawing = false
   canvas.drawing_allowed = false
-  show_hide_drawing_tool()
+  show_hide_tools()
 
   canvas.pointer = (e) ->
     {x: e.clientX - r.left, y: e.clientY - r.top}
@@ -290,6 +314,10 @@ $(document).ready ->
   $("#start_button").click -> if ws && room.is_admin
     ws.puts type: "start"
 
+  $("#skip_button").click -> if ws && room.is_admin && room.in_turn
+    ws.puts type: "skip"
+
+
   $.getJSON("#{location.pathname}.json", (data) ->
     room = data
 
@@ -315,9 +343,13 @@ $(document).ready ->
     if room.players
       add_player player for player in room.players
 
+    room.in_turn = false
+
     if room.ends_at
+      room.in_turn = true
       remaining_to = Date.parse(room.ends_at)
     if room.next_at
+      room.in_turn = true
       remaining_to = Date.parse(room.next_at)
 
     $(".admin_tool").show() if room.is_admin

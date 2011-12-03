@@ -148,7 +148,7 @@ module GrabFeeling
               logs: @room.logs.reverse_order.limit(10).map{|l| {message: l.text, name: l.name, player_id: (l.player && l.player.id)} },
               players: @room.players.map{|pl| {name: pl.name, id: pl.id, point: pl.point, online: pl.online, you: pl.id == @player.id, admin: pl.admin} },
               token: @player.token, debug: development?, websocket: Config["url"]["ws"],
-              player_id: @player.id, is_admin: @player.admin}
+              player_id: @player.id, is_admin: @player.admin, in_game: @room.in_game}
       if @room.in_game
         if (round = @room.rounds.last)
           json[:topic] = round.drawer_id == @player.id ? round.theme.text : round.topic

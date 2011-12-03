@@ -210,6 +210,11 @@ module GrabFeeling
                 player.leave
               end
             when "skip"
+              room = Room.find_by_id(i[:room_id])
+              if room.in_game && (round = room.rounds.last) && (from = room.players.where(id: i[:player_id]).first) && from.admin
+                room.add_system_log :skiped, name: i[:name]
+                round.end(@@pool, nil, true)
+              end
             when "deop"
               room = Room.find_by_id(i[:room_id])
               if (from = room.players.where(id: i[:player_id]).first) && from.admin && (player = room.players.where(id: json["to"]).first) && player.admin
