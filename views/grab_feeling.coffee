@@ -63,7 +63,6 @@ add_player = (opt) ->
 
   e = $tmp.player(".player_name": name,
                   ".point": point.toString())
-  dbg e
 
   e.addClass('player')
   e.attr("id", "player#{player_id}")
@@ -89,8 +88,10 @@ add_player = (opt) ->
 
   # to be implemented
   #e.children(".kick").click e[0].deop
+  #
+  dbg e
 
-  $("#player_list").children("ul").append $("<li>").append(e)
+  $("#player_list").append $("<li>").append(e)
   $("#cursors").append($("<div>").attr(id: "cursor#{player_id}", class: "cursor").text(name))
 
 connect_websocket = ->
