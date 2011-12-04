@@ -19,14 +19,6 @@ module GrabFeeling
     @@timeout = Config["websocket"]["timeout"]
     @@ping_interval = Config["websocket"]["ping_interval"]
 
-    ActiveRecord::Base.connection_pool.with_connection do
-      ActiveRecord::Base.transaction do
-        Player.all.each do |player|
-          player.update_attributes! online: false
-        end
-      end
-    end
-
     def self.hook_event(name,&block)
       (@@event_hooks[name] ||= []) << block
     end
@@ -273,8 +265,7 @@ module GrabFeeling
       set :public_folder => Proc.new { File.join(root, 'public') }
       set :views => Proc.new { File.join(root, 'views') }
       set :default_locale, 'ja'
-      ::I18n.load_path += Dir["#{root}/i18n/*.yml"]
-      use Rack::Session::Cookie, :expire_after => 60*60*24*12
+      ::I18n.load_path = Dir["#{root}/i18n/*.yml"]
     end
 
     post "/event/:name" do

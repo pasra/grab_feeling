@@ -35,15 +35,18 @@ module GrabFeeling
 
     configure do
       helpers GrabFeeling::Helper
-      set :lock, true
+      ::I18n.load_path = Dir["#{root}/i18n/*.yml"]
       set :server => :thin
       set :root, File.expand_path("#{File.dirname(__FILE__)}/../..")
       set :public_folder => Proc.new { File.join(root, 'public') }
       set :views => Proc.new { File.join(root, 'views') }
       set :default_locale, 'ja'
-      ::I18n.load_path = Dir["#{root}/i18n/*.yml"]
+
+      Dir.mkdir("#{root}/tmp") unless File.exist?("#{root}/tmp")
       use Rack::Session::Cookie,
-        :expire_after => 60 * 60 * 24 * 12
+        key: "#{root}/tmp/rack.session",
+        secret: Config["session"]["secret"],
+        expire_after: 60 * 60 * 24 * 12
     end
 
     configure :production, :test do

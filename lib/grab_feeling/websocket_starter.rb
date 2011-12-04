@@ -7,6 +7,16 @@ require_relative './app_ws.rb'
 module GrabFeeling
   class SocketApp
     EM.next_tick do
+
+    ActiveRecord::Base.connection_pool.with_connection do
+      ActiveRecord::Base.transaction do
+        Player.all.each do |player|
+          player.update_attributes! online: false
+        end
+      end
+    end
+
+
       ws_opt = if Config["websocket"] && Config["websocket"]["socket"]
                  {host: Config["websocket"]["socket"], port: nil}
                else

@@ -23,6 +23,9 @@ websocket:
   timeout: 20
   ping_interval: 10
 
+session:
+  secret: pleasechangeme
+
 operation:
   max_players: 10
   max_viewers: 10
