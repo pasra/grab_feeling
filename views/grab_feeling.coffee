@@ -268,7 +268,7 @@ setup_canvas = ->
       canvas.old_point = point
 
   drawed = (e) ->
-    $("#chat_field").focus()
+    $("#chat_field").focus() unless window.is_mobile
     canvas.drawing = false
   $(canvas).mouseup drawed
   $(canvas).mouseout drawed

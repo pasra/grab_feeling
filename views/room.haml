@@ -23,6 +23,9 @@
     - if @is_mobile
       %link{rel: "stylesheet", type: "text/css", href: "/css/ipad_grab_feeling.css"}
       %meta{name: "apple-mobile-web-app-capable", content: "yes"}
+      %script{type: 'text/javascript'}= "window.is_mobile = true"
+    - else
+      %script{type: 'text/javascript'}= "window.is_mobile = false"
   %body
     %div#cursors
     %div#container
