@@ -1,4 +1,9 @@
-* { font-family: sans-serif; }
+body {
+  font-family:"メイリオ", "Meiryo", "Hiragino Kaku Gothic", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", Geneva, Arial, Verdana, sans-serif;
+  padding: 0px 0px 0px 0px;
+  margin: 0px auto 0px auto;
+  width: 1024px;
+}
 
 #the_canvas {
   border: 1px solid black;
@@ -6,7 +11,7 @@
 
 .log {
   overflow: auto;
-  width: 280px;
+  width: 262px;
 }
 
 #system_log {
@@ -14,7 +19,7 @@
 }
 
 #chat_field {
-  width: 240px;
+  width: 222px;
 }
 
 .log p, #buttons p {
@@ -23,10 +28,11 @@
 }
 
 .color_button {
-  width: 18px;
+  width: 22px;
   border: 1px solid white;
-  padding: 0; margin: 0;
-  height: 30px;
+  padding: 0;
+  margin: 0;
+  height: 22px;
 }
 
 #color_ffffff {
@@ -64,14 +70,15 @@
   margin-right: 10px;
 }
 
-header #remaining_timer{
+header #remaining_timer {
   float: right;
 }
+
 header #topic {
   float: left;
 }
 
-header *{
+header * {
   font-size: 2em;
 }
 
