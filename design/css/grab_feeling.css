@@ -1,0 +1,115 @@
+body {
+	font-family:"メイリオ", "Meiryo", "Hiragino Kaku Gothic", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", Geneva, Arial, Verdana, sans-serif;
+	padding: 0px 0px 0px 0px;
+	margin: 0px auto 0px auto;
+	width: 1024px;
+}
+#the_canvas {
+	border: 1px solid black;
+}
+.log {
+	overflow: auto;
+	width: 262px;
+}
+#system_log {
+	height: 120px;
+}
+#chat_field {
+	width: 222px;
+}
+.log p, #buttons p {
+	margin: 0px;
+	padding: 0px;
+}
+.color_button {
+	width: 22px;
+	border: 1px solid white;
+	padding: 0;
+	margin: 0;
+	height: 22px;
+}
+#color_ffffff {
+	border: 1px solid black;
+	padding: -1px;
+}
+#colors {
+}
+.color_button_container {
+	padding: 2px;
+	background-color: white;
+	margin-right: 3px;
+	float: left;
+}
+.color_selected {
+	background-color: black;
+}
+#system_log {
+	height: 189px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid gray;
+}
+#chat_log {
+	padding-top: 5px;
+	height: 300px;
+}
+#left {
+	float: left;
+	margin-right: 10px;
+}
+header #remaining_timer {
+	float: right;
+}
+header #topic {
+	float: left;
+}
+header * {
+	font-size: 2em;
+}
+#clear {
+	clear: both;
+	width:0;
+	height:0;
+	margin:0;
+	padding:0;
+}
+.player_offline {
+	color: gray;
+}
+.cursor {
+	position: absolute;
+	display: none;
+	border: 1px solid gray;
+	background-color: white;
+	padding: 2px 3px;
+	margin: 0px;
+}
+.player_menu {
+	display: none;
+}
+.player:hover .player_menu, .player_menu:hover {
+	display: block;
+	position: absolute;
+	bottom: -2px;
+	margin-bottom: 10px;
+	background-color: white;
+	height: 30px;
+	border: 1px solid gray;
+}
+#player_list, .player_menu ul {
+	margin-left: 0px;
+	padding-left: 0px;
+	margin-top: 0px;
+	padding-top: 0px;
+}
+#player_list li {
+	list-style: none;
+	margin-right: 10px;
+	float: left;
+}
+.player_menu ul li {
+	list-style: none;
+	margin-right: 0px;
+}
+.admin_menu_hint {
+	height: 16px;
+}

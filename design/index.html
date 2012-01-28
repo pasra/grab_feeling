@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Grab Feeling</title>
+    <script type='text/javascript'>window.locale = "ja"; window.localization = {"title":"Grab Feeling","create_room":"\u30eb\u30fc\u30e0\u3092\u4f5c\u6210","room_list":"\u30eb\u30fc\u30e0\u30ea\u30b9\u30c8","room":{"name":"\u30eb\u30fc\u30e0\u540d","info":"\u30eb\u30fc\u30e0\u60c5\u5831","players":"\u30d7\u30ec\u30a4\u30e4\u30fc","viewers":"\u611f\u67d3\u8005","listed":"\u30eb\u30fc\u30e0\u30ea\u30b9\u30c8\u306b\u8868\u793a","watchable":"\u89b3\u6226\u3092\u8a31\u53ef","join_key":"\u53c2\u52a0\u30d1\u30b9\u30ef\u30fc\u30c9","watch_key":"\u89b3\u6226\u30d1\u30b9\u30ef\u30fc\u30c9","submit":"\u30eb\u30fc\u30e0\u3092\u4f5c\u6210","join_view":"\u53c2\u52a0/\u89b3\u6226"},"player":{"name":"\u540d\u524d"},"your_info":"\u3042\u306a\u305f\u306e\u60c5\u5831","leave":"\u9000\u5ba4","ui":{"retriving_data":"\u30eb\u30fc\u30e0\u60c5\u5831\u3092\u53d6\u5f97\u3057\u3066\u3044\u307e\u3059","another_connected":"\u540c\u3058\u30eb\u30fc\u30e0\u306f\u540c\u6642\u306b1\u30a6\u30a3\u30f3\u30c9\u30a6\u307e\u3067\u3057\u304b\u958b\u304f\u3053\u3068\u304c\u3067\u304d\u307e\u305b\u3093\uff0e\u65b0\u3057\u3044\u30a6\u30a3\u30f3\u30c9\u30a6\u3092\u512a\u5148\u3057\u3053\u306e\u30a6\u30a3\u30f3\u30c9\u30a6\u306f\u30b2\u30fc\u30e0\u30b5\u30fc\u30d0\u30fc\u304b\u3089\u5207\u65ad\u3055\u308c\u307e\u3059","connecting":"\u30b2\u30fc\u30e0\u30b5\u30fc\u30d0\u30fc\u306b\u63a5\u7d9a\u3057\u3066\u3044\u307e\u3059...","connected":"\u63a5\u7d9a\u3057\u307e\u3057\u305f","loading":"\u30ad\u30e3\u30f3\u30d0\u30b9\u3092\u8aad\u307f\u8fbc\u3093\u3067\u3044\u307e\u3059...","loaded":"\u8aad\u307f\u8fbc\u307f\u307e\u3057\u305f","start":"\u30b2\u30fc\u30e0\u958b\u59cb","errord":"\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f","disconnected":"\u30b2\u30fc\u30e0\u30b5\u30fc\u30d0\u30fc\u3068\u306e\u63a5\u7d9a\u304c\u4ee5\u4e0b\u306e\u7406\u7531\u306b\u3088\u308a\u5207\u65ad\u3055\u308c\u307e\u3057\u305f","try_reconnect":"\u518d\u63a5\u7d9a\u3092\u8a66\u307f\u307e\u3059","color":{"white":"\u767d","black":"\u9ed2","green":"\u7dd1","red":"\u8d64","blue":"\u9752"},"width":{"one":"\u592a\u30551","two":"\u592a\u30552","three":"\u592a\u30553","five":"\u592a\u30555","ten":"\u592a\u305510"},"clear":"\u30af\u30ea\u30a2","snapshot":"\u30b9\u30ca\u30c3\u30d7\u30b7\u30e7\u30c3\u30c8","add_op":"+o","deop":"-o","kick":"\u8ffd\u653e","skip":"\u30b9\u30ad\u30c3\u30d7\u3059\u308b","end":"\u30b2\u30fc\u30e0\u7d42\u4e86","youre_kicked":"\u8ffd\u653e\u3055\u308c\u307e\u3057\u305f","hints":{"add_op":"\u30aa\u30da\u30ec\u30fc\u30bf\u306b\u3059\u308b","deop":"\u30aa\u30da\u30ec\u30fc\u30bf\u6a29\u9650\u3092\u5265\u596a","kick":"\u30eb\u30fc\u30e0\u304b\u3089\u8ffd\u653e\u3059\u308b"}},"player_joined":"%{name} \u3055\u3093\u304c\u53c2\u52a0\u3057\u307e\u3057\u305f","player_left":"%{name} \u3055\u3093\u304c\u9000\u5ba4\u3057\u307e\u3057\u305f","say":"\u767a\u8a00","kicked":"%{from} \u3055\u3093\u304c %{name} \u3055\u3093\u3092\u8ffd\u653e\u3057\u307e\u3057\u305f","cleared":"%{name} \u3055\u3093\u304c\u30af\u30ea\u30a2\u3057\u307e\u3057\u305f","game_end":"\u30b2\u30fc\u30e0\u7d42\u4e86\u3067\u3059","round_end":"\u30bf\u30fc\u30f3\u7d42\u4e86; \u6b63\u89e3\u306f\u300c%{answer}\u300d\u3067\u3057\u305f! %{next_game} \u79d2\u5f8c\u306b\u6b21\u306e %{next_drawer} \u3055\u3093\u306e\u30bf\u30fc\u30f3\u304c\u59cb\u307e\u308a\u307e\u3059","last_round_end":"\u30bf\u30fc\u30f3\u7d42\u4e86! \u6b63\u89e3\u306f\u300c%{answer}\u300d\u3067\u3057\u305f!","round_start":"%{drawer} \u3055\u3093\u306e\u30bf\u30fc\u30f3\u304c\u958b\u59cb\u3057\u307e\u3057\u305f","correct":"%{name} \u3055\u3093\u304c\u6b63\u89e3! %{point} \u7372\u5f97!","skiped":"%{name} \u3055\u3093\u304c\u30bf\u30fc\u30f3\u3092\u30b9\u30ad\u30c3\u30d7\u3057\u307e\u3057\u305f","game_start":"\u30b2\u30fc\u30e0\u958b\u59cb\u3067\u3059","no_online_players":"\u30aa\u30f3\u30e9\u30a4\u30f3\u306e\u30e1\u30f3\u30d0\u30fc\u304c\u5b58\u5728\u3057\u306a\u3044\u305f\u3081\u30b2\u30fc\u30e0\u3092\u7d42\u4e86\u3057\u307e\u3059","add_op":"%{from} \u3055\u3093\u304c %{name} \u3055\u3093\u3092\u30aa\u30da\u30ec\u30fc\u30bf\u306b\u3057\u307e\u3057\u305f","deop":"%{from} \u3055\u3093\u304c %{name} \u3055\u3093\u3092\u30aa\u30da\u30ec\u30fc\u30bf\u304b\u3089\u5916\u3057\u307e\u3057\u305f"}</script>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js'></script>
+    <script src='https://raw.github.com/hinassan/templou/master/templou.js'></script>
+    <script src='/js/i18n.js'></script>
+    <script src='/js/grab_feeling.js'></script>
+    <link href='/css/grab_feeling.css' rel='stylesheet' type='text/css' />
+    <script type='text/javascript'>window.is_mobile = false</script>
+  </head>
+  <body>
+    <div id='cursors'></div>
+    <div id='container'>
+      <div id='left'>
+        <header>
+          <div id='topic'></div>
+          <div id='remaining_timer'>--:--</div>
+        </header>
+        <div id='clear'></div>
+        <canvas height='550' id='the_canvas' width='750'></canvas>
+        <div id='drawing_tools'>
+          <div class='drawing_tool' id='colors'></div>
+          <div class='drawing_tool'>
+            <input class='width_button' id='width_1' type='button' value='太さ1' />
+            <input class='width_button' id='width_2' type='button' value='太さ2' />
+            <input class='width_button' id='width_3' type='button' value='太さ3' />
+            <input class='width_button' id='width_5' type='button' value='太さ5' />
+            <input class='width_button' id='width_10' type='button' value='太さ10' />
+          </div>
+          <div class='drawing_tool'>
+            <input class='drawing_tool' id='clear_button' type='button' value='クリア' />
+          </div>
+        </div>
+        <div>
+          <ul id='player_list'></ul>
+          <div templou='player'>
+            <span class='player_name'>name</span>
+            (
+            <span class='point'>0</span>
+            )
+            <div class='player_menu'>
+              <ul class='admin_tool'>
+                <li>
+                  <input class='add_op' type='button' value='+o' />
+                </li>
+                <li>
+                  <input class='deop' type='button' value='-o' />
+                </li>
+                <li>
+                  <input class='kick' type='button' value='追放' />
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div id='clear'></div>
+      </div>
+      <div id='right'>
+        <div id='buttons'>
+          <p>
+            <input id='snapshot' type='button' value='スナップショット' />
+            <input class='admin_tool' id='start_button' type='button' value='ゲーム開始' />
+            <input class='admin_tool in_turn_tool' id='skip_button' type='button' value='スキップする' />
+            <input class='admin_tool in_game_tool' id='end_button' type='button' value='ゲーム終了' />
+            <form action='/g/754f5ff/leave' method='POST'>
+              <input name='leave' type='submit' value='退室' />
+            </form>
+          </p>
+        </div>
+        <div id='logs'>
+          <div class='log' id='system_log'></div>
+          <div id='chat'>
+            <div class='log' id='chat_log'></div>
+            <form action='#' id='chat_form'>
+              <input id='chat_field' size='40' type='text' />
+              <input disabled='disabled' type='submit' value='発言' />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
